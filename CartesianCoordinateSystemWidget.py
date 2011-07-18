@@ -8,12 +8,12 @@
 # according to its coordinate system. It translates the underlying
 # coordinate system into its own according to users settings.
 
-from PyQt4.QtCore import (Qt, QRectF, QPointF)
+from PyQt4.QtCore import (Qt, QRectF, QPointF, QTimer, QObject, SIGNAL)
 from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView, 
     QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout)
 
 class CartesianCoordinateSystemWidget(QGraphicsItem):
-    def __init__(self, width=500, height=500, xMin = -10, xMax = 1, yMin = -1, yMax = 10):
+    def __init__(self, width=500, height=500, xMin = -10, xMax = 10, yMin = -10, yMax = 10):
         super(CartesianCoordinateSystemWidget, self).__init__()
         
         self.width  = width
@@ -23,7 +23,9 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         self.yMin   = yMin
         self.yMax   = yMax
         
-        self.Rect = QRectF(-width/2, -height/2, width, height)
+        # todo: investigate why QRectF needs to be larger than
+        # expected.. (does it?!)
+        self.Rect = QRectF(-width, -height, width*2, height*2)
         
         # centre of logical coordinate system gets
         # positioned where (0,0) of the origin of
@@ -49,25 +51,63 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             self.yAxis = 0
         else:
             self.yAxis = height / (yMax - yMin) * -yMin
-            
-        print self.xAxis, self.yAxis
         
         self.setPos(QPointF(self.xAxis, self.yAxis))
+        
+        # some fun :-)
+        
+        #~ # rotate the coordinate system
+        self.timer = QTimer()
+        QObject.connect(self.timer, SIGNAL("timeout()"), self.timeout)
+            
+        self.timer.start(20)
+            
+    def timeout(self):
+        self.rotate(1)
      
+        #~ # end of fun
+        
+        
     # implementation mandatory
     def boundingRect(self):
         return self.Rect
+        
+    # Translates cartesian coordinates (from own coord. system)
+    # to item coordinates
+    # i.e. give it x = 2, y = 5 and receive 150,370 or something alike.
+    def toItemCoord(self, x, y):
+        countXNumber = self.xMax - self.xMin
+        countYNumber = self.yMax - self.yMin
+        xItem = self.width / countXNumber * x
+        yItem = self.height/ countYNumber * y
+        
+        return QPointF(xItem, yItem)
+        
 
     def paint(self, painter, option, widget=None):
-        painter.setPen(QPen(QColor(255, 0, 0)))
+        ordinateColor = QPen(QColor(255, 0, 0))
+        normalLineCol = QPen(QColor(0, 0, 255))
         
-        #~ for i in range (self.xMin, self.xMax+1):
-            #~ painter.drawLine(-self.height/2, , self.heigt/2
-            #~ print i
+        for i in range (self.xMin, self.xMax+1):
+            if i == 0:
+                painter.setPen(ordinateColor)
+            else:
+                painter.setPen(normalLineCol)
+                
+            painter.drawLine(self.toItemCoord(i,self.yMin), self.toItemCoord(i,self.yMax))
+
+        for i in range (self.yMin, self.yMax+1):
+            
+            if i == 0:
+                painter.setPen(ordinateColor)
+            else:
+                painter.setPen(normalLineCol)
+            
+            painter.drawLine(self.toItemCoord(self.xMin,i), self.toItemCoord(self.xMax,i))
             
         # todo..
-        painter.drawLine(-self.width, 0, self.width, 0)
-        painter.drawLine(0,-self.height/2,0,self.height/2)
+        #~ painter.drawLine(-self.width, 0, self.width, 0)
+        #~ painter.drawLine(0,-self.height/2,0,self.height/2)
         
   
 
