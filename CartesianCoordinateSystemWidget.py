@@ -13,12 +13,15 @@ from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView,
     QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout)
 
 class CartesianCoordinateSystemWidget(QGraphicsItem):
-    def __init__(self):
+    def __init__(self, width=500, height=500):
         super(CartesianCoordinateSystemWidget, self).__init__()
         
-        self.Rect = QRectF(-100, -100, 200, 200)
+        self.width = width
+        self.height= height
         
-        self.setPos(QPointF(250, 250))
+        self.Rect = QRectF(-width/2, -height/2, width, height)
+        
+        self.setPos(QPointF(width/2, height/2))
      
     # needs implementation 
     def boundingRect(self):
@@ -26,23 +29,28 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
 
     def paint(self, painter, option, widget=None):
         painter.setPen(QPen(QColor(255, 0, 0)))
-        painter.drawLine(-250,0,250,0)
-        painter.drawLine(0,-250,0,250)
+        painter.drawLine(-self.width/2,0,self.width/2,0)
+        painter.drawLine(0,-self.height/2,0,self.height/2)
         
   
+
 
 if __name__ == '__main__':
     import sys
 
+    # this ist to be factored out into a general loader.
     app = QApplication(sys.argv)
     
+    width = 700
+    height = 200
+    
     scene = QGraphicsScene()
-    scene.setSceneRect(0, 0, 500, 500)
+    scene.setSceneRect(0, 0, width, height)
     
     view = QGraphicsView()
     view.setScene(scene)
     
-    ccs = CartesianCoordinateSystemWidget()
+    ccs = CartesianCoordinateSystemWidget(width, height)
     scene.addItem(ccs)
     
     dialog = QDialog()
@@ -55,4 +63,7 @@ if __name__ == '__main__':
     dialog.show()
     
     app.exec_()
+    
+    
+    
     
