@@ -50,20 +50,20 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         elif yMin >= 0 and yMax >= 0:
             self.yAxis = 0
         else:
-            self.yAxis = height / (yMax - yMin) * -yMin
+            self.yAxis = height - (height / (yMax - yMin) * -yMin)
         
         self.setPos(QPointF(self.xAxis, self.yAxis))
         
         # some fun :-)
         
-        # rotate the coordinate system
-        #~ self.timer = QTimer()
-        #~ QObject.connect(self.timer, SIGNAL("timeout()"), self.timeout)
+        #~ # rotate the coordinate system
+        self.timer = QTimer()
+        QObject.connect(self.timer, SIGNAL("timeout()"), self.timeout)
             
-        #~ self.timer.start(20)
+        self.timer.start(20)
             
-    #~ def timeout(self):
-        #~ self.rotate(1)
+    def timeout(self):
+        self.rotate(1)
      
         # end of fun
         
@@ -82,7 +82,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         
         # width / countNumber -> width of one item
         xItem = self.width / numberXItems * x
-        yItem = self.height/ numberYItems * y
+        yItem = - (self.height/ numberYItems * y)
         
         return QPointF(xItem, yItem)
         
@@ -140,7 +140,7 @@ if __name__ == '__main__':
     view = QGraphicsView()
     view.setScene(scene)
     
-    ccs = CartesianCoordinateSystemWidget(width, height, -2,4,-10,10)
+    ccs = CartesianCoordinateSystemWidget(width, height, -2,4,-1,10)
     scene.addItem(ccs)
     
     dialog = QDialog()
