@@ -56,16 +56,16 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         
         # some fun :-)
         
-        #~ # rotate the coordinate system
-        self.timer = QTimer()
-        QObject.connect(self.timer, SIGNAL("timeout()"), self.timeout)
+        # rotate the coordinate system
+        #~ self.timer = QTimer()
+        #~ QObject.connect(self.timer, SIGNAL("timeout()"), self.timeout)
             
-        self.timer.start(20)
+        #~ self.timer.start(20)
             
-    def timeout(self):
-        self.rotate(1)
+    #~ def timeout(self):
+        #~ self.rotate(1)
      
-        #~ # end of fun
+        # end of fun
         
         
     # implementation mandatory
@@ -76,10 +76,13 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
     # to item coordinates
     # i.e. give it x = 2, y = 5 and receive 150,370 or something alike.
     def toItemCoord(self, x, y):
-        countXNumber = self.xMax - self.xMin
-        countYNumber = self.yMax - self.yMin
-        xItem = self.width / countXNumber * x
-        yItem = self.height/ countYNumber * y
+        # number of items is max - min, 12 - -3 = 15 :-)
+        numberXItems = self.xMax - self.xMin
+        numberYItems = self.yMax - self.yMin
+        
+        # width / countNumber -> width of one item
+        xItem = self.width / numberXItems * x
+        yItem = self.height/ numberYItems * y
         
         return QPointF(xItem, yItem)
         
@@ -103,19 +106,16 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             else:
                 painter.setPen(normalLineCol)
             
-            painter.drawLine(self.toItemCoord(self.xMin,i), self.toItemCoord(self.xMax,i))
-            
-        # todo..
-        #~ painter.drawLine(-self.width, 0, self.width, 0)
-        #~ painter.drawLine(0,-self.height/2,0,self.height/2)
-        
-  
+            painter.drawLine(
+                self.toItemCoord(self.xMin,i), 
+                self.toItemCoord(self.xMax,i)
+            )
 
 
 if __name__ == '__main__':
     import sys
 
-    # this ist to be factored out into a general loader.
+    # this is to be factored out into a general loader.
     app = QApplication(sys.argv)
     
     width = 500
@@ -127,7 +127,7 @@ if __name__ == '__main__':
     view = QGraphicsView()
     view.setScene(scene)
     
-    ccs = CartesianCoordinateSystemWidget(width, height)
+    ccs = CartesianCoordinateSystemWidget(width, height, -2,4,-10,10)
     scene.addItem(ccs)
     
     dialog = QDialog()
