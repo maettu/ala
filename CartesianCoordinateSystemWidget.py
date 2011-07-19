@@ -8,7 +8,7 @@
 # according to its coordinate system. It translates the underlying
 # coordinate system into its own according to users settings.
 
-from PyQt4.QtCore import (Qt, QRectF, QPointF, QTimer, QObject, SIGNAL)
+from PyQt4.QtCore import (Qt, QRectF, QPointF, QTimer, QObject, SIGNAL, QString)
 from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView, 
     QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout)
 
@@ -97,7 +97,15 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             else:
                 painter.setPen(normalLineCol)
                 
-            painter.drawLine(self.toItemCoord(i,self.yMin), self.toItemCoord(i,self.yMax))
+            painter.drawLine(
+                self.toItemCoord(i,self.yMin), 
+                self.toItemCoord(i,self.yMax)
+            )
+            
+            painter.drawText(
+                self.toItemCoord(i, 0),
+                QString.number(i)
+            )
 
         for i in range (self.yMin, self.yMax+1):
             
@@ -109,6 +117,11 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             painter.drawLine(
                 self.toItemCoord(self.xMin,i), 
                 self.toItemCoord(self.xMax,i)
+            )
+            
+            painter.drawText(
+                self.toItemCoord(0,i),
+                QString.number(i)
             )
 
 
