@@ -10,7 +10,7 @@
 
 from PyQt4.QtCore import (Qt, QRectF, QPointF, QTimer, QObject, SIGNAL, QString)
 from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView, 
-    QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout, QBrush)
+    QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout, QBrush, QPainter)
 
 class CartesianCoordinateSystemWidget(QGraphicsItem):
     def __init__(
@@ -158,9 +158,9 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
 
 # movable Point, by coordinate system automatically positioned.
 # has coordinate system as parent (at the moment, every class could
-# instantiate PointMovable
+# instantiate PointMovable)
 
-# should go into separate class, I suppose
+# should go into separate file, I suppose
 class PointMovable(QGraphicsItem):
     def __init__(self, red, green, blue, x, y, size, parent):
         super(PointMovable, self).__init__(parent)
@@ -219,6 +219,7 @@ if __name__ == '__main__':
     
     view = QGraphicsView()
     view.setScene(scene)
+    view.setRenderHint(QPainter.Antialiasing)
     
     #todo: antialiasing
     
