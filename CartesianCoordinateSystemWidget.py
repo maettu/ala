@@ -70,13 +70,13 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         # some fun :-)
         # rotate the coordinate system
         
-        self.timer = QTimer()
-        QObject.connect(self.timer, SIGNAL("timeout()"), self.timeout)
+        #~ self.timer = QTimer()
+        #~ QObject.connect(self.timer, SIGNAL("timeout()"), self.timeout)
             
-        self.timer.start(20)
+        #~ self.timer.start(20)
             
-    def timeout(self):
-        self.rotate(1)
+    #~ def timeout(self):
+        #~ self.rotate(1)
      
         # end of fun
         
@@ -144,10 +144,17 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             
     def addPoint(self, x,y, size):
         p = self.toItemCoord(x,y)
+        x = p.x() - size / 2
+        y = p.y() - size / 2
+        point = PointMovable(0,255,0,x,y,size, self)
+        return point
+        
+    def addPointDependent(self, x,y, size, parent):
+        p = self.toItemCoord(x,y)
         x = p.x()
         y = p.y()
         print x,y
-        point = PointMovable(0,255,0,x,y,size, self)
+        return PointMovable(0,100,0,x,y,size, parent)
 
 # movable Point, by coordinate system automatically positioned.
 # has coordinate system as parent (at the moment, every class could
@@ -164,7 +171,7 @@ class PointMovable(QGraphicsItem):
         
         self.x = x
         self.y = y
-        self.setPos(QPointF(self.x-size/2, self.y-size/2))
+        self.setPos(QPointF(self.x, self.y))
         
     def boundingRect(self):
         return self.Rect
@@ -213,10 +220,16 @@ if __name__ == '__main__':
     view = QGraphicsView()
     view.setScene(scene)
     
-    ccs = CartesianCoordinateSystemWidget(width, height, 10, -2,4,-1,10)
-    scene.addItem(ccs)
+    #todo: antialiasing
     
-    ccs.addPoint(3,3,10)
+    ccs = CartesianCoordinateSystemWidget(width, height, 10, -2,4,-1,10)
+  
+    
+    point1 = ccs.addPoint(3,3,10)
+    point2 = ccs.addPointDependent(1,1,10,point1)
+    point3 = ccs.addPointDependent(-1,0,10,point2)
+    
+    scene.addItem(ccs)
     
     dialog = QDialog()
     layout = QVBoxLayout()
