@@ -13,15 +13,28 @@ from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView,
     QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout)
 
 class CartesianCoordinateSystemWidget(QGraphicsItem):
-    def __init__(self, width=500, height=500, xMin = -10, xMax = 10, yMin = -10, yMax = 10):
+    def __init__(
+            self, widthPixel=500, 
+            heightPixel=500, 
+            marginPixel = 10, 
+            xMin = -10, 
+            xMax = 10, 
+            yMin = -10, 
+            yMax = 10, 
+            tickXOffset=0.1, 
+            tickYOffset=0.1
+        ):
         super(CartesianCoordinateSystemWidget, self).__init__()
         
-        self.width  = width
-        self.height = height
-        self.xMin   = xMin
-        self.xMax   = xMax
-        self.yMin   = yMin
-        self.yMax   = yMax
+        self.width          = widthPixel - marginPixel * 2
+        self.height         = heightPixel - marginPixel * 2
+        self.margin         = marginPixel
+        self.xMin           = xMin
+        self.xMax           = xMax
+        self.yMin           = yMin
+        self.yMax           = yMax
+        self.tickXOffset    = tickXOffset
+        self.tickYOffset    = tickYOffset
         
         # todo: investigate why QRectF needs to be larger than
         # expected.. (does it?!)
@@ -43,27 +56,27 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         elif xMin >= 0 and xMax >= 0:
             self.xAxis = 0
         else:
-            self.xAxis = width / (xMax - xMin) * -xMin
+            self.xAxis = width / (xMax - xMin) * -xMin + self.margin / 2
             
         if yMin <= 0 and yMax <= 0:
             self.yAxis = height
         elif yMin >= 0 and yMax >= 0:
             self.yAxis = 0
         else:
-            self.yAxis = height - (height / (yMax - yMin) * -yMin)
+            self.yAxis = height - (height / (yMax - yMin) * -yMin) - self.margin / 2
         
         self.setPos(QPointF(self.xAxis, self.yAxis))
         
         # some fun :-)
         
         #~ # rotate the coordinate system
-        self.timer = QTimer()
-        QObject.connect(self.timer, SIGNAL("timeout()"), self.timeout)
+        #~ self.timer = QTimer()
+        #~ QObject.connect(self.timer, SIGNAL("timeout()"), self.timeout)
             
-        self.timer.start(20)
+        #~ self.timer.start(20)
             
-    def timeout(self):
-        self.rotate(1)
+    #~ def timeout(self):
+        #~ self.rotate(1)
      
         # end of fun
         
@@ -102,8 +115,11 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 self.toItemCoord(i,self.yMax)
             )
             
+            tickCoord = self.toItemCoord(i, 0)
+            tickCoord += self.toItemCoord(self.tickXOffset, self.tickYOffset)
+            print tickCoord.x()
             painter.drawText(
-                self.toItemCoord(i, 0),
+                tickCoord,
                 QString.number(i)
             )
 
@@ -119,8 +135,11 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 self.toItemCoord(self.xMax,i)
             )
             
+            tickCoord = self.toItemCoord(0,i)
+            tickCoord += self.toItemCoord(self.tickXOffset, self.tickYOffset)
+            print tickCoord.x()
             painter.drawText(
-                self.toItemCoord(0,i),
+                tickCoord,
                 QString.number(i)
             )
 
@@ -131,8 +150,8 @@ if __name__ == '__main__':
     # this is to be factored out into a general loader.
     app = QApplication(sys.argv)
     
-    width = 500
-    height = 500
+    width = 520
+    height = 520
     
     scene = QGraphicsScene()
     scene.setSceneRect(0, 0, width, height)
@@ -140,7 +159,7 @@ if __name__ == '__main__':
     view = QGraphicsView()
     view.setScene(scene)
     
-    ccs = CartesianCoordinateSystemWidget(width, height, -2,4,-1,10)
+    ccs = CartesianCoordinateSystemWidget(width, height, 10, -2,4,-1,10)
     scene.addItem(ccs)
     
     dialog = QDialog()
