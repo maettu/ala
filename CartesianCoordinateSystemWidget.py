@@ -10,7 +10,7 @@
 
 from PyQt4.QtCore import (Qt, QRectF, QPointF, QTimer, QObject, SIGNAL, QString)
 from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView, 
-    QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout)
+    QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout, QBrush)
 
 class CartesianCoordinateSystemWidget(QGraphicsItem):
     def __init__(
@@ -68,18 +68,17 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         self.setPos(QPointF(self.xAxis, self.yAxis))
         
         # some fun :-)
+        # rotate the coordinate system
         
-        #~ # rotate the coordinate system
-        #~ self.timer = QTimer()
-        #~ QObject.connect(self.timer, SIGNAL("timeout()"), self.timeout)
+        self.timer = QTimer()
+        QObject.connect(self.timer, SIGNAL("timeout()"), self.timeout)
             
-        #~ self.timer.start(20)
+        self.timer.start(20)
             
-    #~ def timeout(self):
-        #~ self.rotate(1)
+    def timeout(self):
+        self.rotate(1)
      
         # end of fun
-        
         
     # implementation mandatory
     def boundingRect(self):
@@ -88,6 +87,8 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
     # Translates cartesian coordinates (from own coord. system)
     # to item coordinates
     # i.e. give it x = 2, y = 5 and receive 150,370 or something alike.
+    
+    # this method supposedly needs to go in separate helper class
     def toItemCoord(self, x, y):
         # number of items is max - min, 12 - -3 = 15 :-)
         numberXItems = self.xMax - self.xMin
@@ -117,7 +118,6 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             
             tickCoord = self.toItemCoord(i, 0)
             tickCoord += self.toItemCoord(self.tickXOffset, self.tickYOffset)
-            print tickCoord.x()
             painter.drawText(
                 tickCoord,
                 QString.number(i)
@@ -137,13 +137,67 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             
             tickCoord = self.toItemCoord(0,i)
             tickCoord += self.toItemCoord(self.tickXOffset, self.tickYOffset)
-            print tickCoord.x()
             painter.drawText(
                 tickCoord,
                 QString.number(i)
             )
+            
+    def addPoint(self, x,y, size):
+        p = self.toItemCoord(x,y)
+        x = p.x()
+        y = p.y()
+        print x,y
+        point = PointMovable(0,255,0,x,y,size, self)
 
+# movable Point, by coordinate system automatically positioned.
+# has coordinate system as parent (at the moment, every class could
+# instantiate PointMovable
 
+# should go into separate class, I suppose
+class PointMovable(QGraphicsItem):
+    def __init__(self, red, green, blue, x, y, size, parent):
+        super(PointMovable, self).__init__(parent)
+        
+        self.Rect = QRectF(0, 0, size, size)
+        
+        self.color = QColor(red, green, blue)
+        
+        self.x = x
+        self.y = y
+        self.setPos(QPointF(self.x-size/2, self.y-size/2))
+        
+    def boundingRect(self):
+        return self.Rect
+        
+    def paint(self, painter, option, widget=None):
+        painter.setPen(Qt.NoPen)
+        painter.setBrush(QBrush(self.color))
+        painter.drawEllipse(self.Rect)
+        
+    # at the moment, point is movable by either left or right
+    # mouse click. hm...
+    def mousePressEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            print 'left click'
+        elif e.button() == Qt.RightButton:
+            print "right click"
+        else:
+            print "other click"
+        
+        # save where in Item mouse was clicked
+        self.xOnWidget = e.pos().x()
+        self.yOnWidget = e.pos().y()
+            
+    def mouseMoveEvent(self, e):
+        
+        x_move = e.pos().x() - self.xOnWidget
+        y_move = e.pos().y() - self.yOnWidget
+        
+        self.x = self.x + x_move
+        self.y = self.y + y_move
+        
+        self.setPos(QPointF(self.x, self.y))
+    
 if __name__ == '__main__':
     import sys
 
@@ -161,6 +215,8 @@ if __name__ == '__main__':
     
     ccs = CartesianCoordinateSystemWidget(width, height, 10, -2,4,-1,10)
     scene.addItem(ccs)
+    
+    ccs.addPoint(3,3,10)
     
     dialog = QDialog()
     layout = QVBoxLayout()
