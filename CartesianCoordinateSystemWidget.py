@@ -3,16 +3,18 @@
 # Cartesian Coordinate System Widget
 # ----------------------------------
 
-# This widget is used to draw items on it. It shows axis, grid
-# (if desired) and provides the ability to draw items on items
-# according to its coordinate system. It translates the underlying
-# coordinate system into its own according to users settings.
 
-from PyQt4.QtCore import (Qt, QRectF, QPointF, QTimer, QObject, SIGNAL, QString)
+
+from PyQt4.QtCore import (Qt, QRectF, QPointF, QLineF, QTimer, QObject, SIGNAL, QString)
 from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView, 
     QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout, QBrush, QPainter)
 
 class CartesianCoordinateSystemWidget(QGraphicsItem):
+    """This widget is used to draw items on it. It shows axis, grid
+    (if desired) and provides the ability to draw items on items
+    according to its coordinate system. It translates the underlying
+    coordinate system into its own according to users settings."""
+    
     def __init__(
             self, widthPixel=500, 
             heightPixel=500, 
@@ -142,19 +144,21 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 QString.number(i)
             )
             
-    def addPoint(self, x,y, size):
+    def addPoint(self, x,y, size, red=0,green=200,blue=0):
         p = self.toItemCoord(x,y)
         x = p.x() - size / 2
         y = p.y() - size / 2
-        point = PointMovable(0,255,0,x,y,size, self)
+        point = PointMovable(self,x,y,size,red,green,blue)
         return point
         
-    def addPointDependent(self, x,y, size, parent):
+    def addPointDependent(self, parent, x,y, size,red=0,green=100,blue=0):
         p = self.toItemCoord(x,y)
         x = p.x()
         y = p.y()
-        print x,y
-        return PointMovable(0,100,0,x,y,size, parent)
+        return PointMovable(parent, x,y,size,red,green,blue)
+        
+    def addLineDependent(self, startPoint, endPoint):
+        return LineAutoMove(startPoint, endPoint)
 
 # movable Point, by coordinate system automatically positioned.
 # has coordinate system as parent (at the moment, every class could
@@ -162,7 +166,9 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
 
 # should go into separate file, I suppose
 class PointMovable(QGraphicsItem):
-    def __init__(self, red, green, blue, x, y, size, parent):
+    """Defines a movable point. """
+    
+    def __init__(self, parent, x, y, size, red=0, green=255, blue=0):
         super(PointMovable, self).__init__(parent)
         
         self.Rect = QRectF(0, 0, size, size)
@@ -204,6 +210,30 @@ class PointMovable(QGraphicsItem):
         self.y = self.y + y_move
         
         self.setPos(QPointF(self.x, self.y))
+        
+class LineAutoMove(QGraphicsItem):
+    """Defines a line by two points. If points are moved, line follows these movements."""
+    
+    def __init__(self, startPoint, endPoint):
+        super(LineAutoMove, self).__init__(startPoint)
+        
+        self.startPoint = startPoint
+        self.endPoint = endPoint
+        
+        self.Rect = QRectF(0,0, endPoint.x,endPoint.y)
+        
+        self.color = QColor(255,0,0)
+        
+    def boundingRect(self):
+        return self.Rect
+        
+    def paint(self, painter, option, widget=None):
+        painter.setPen(QColor("orange"))
+        
+        # as soon as dependent points are *not relative* to parent points any more,
+        # this needs to be changed.
+        painter.drawLine(QLineF(0, 0, self.endPoint.x, self.endPoint.y))
+        print self.startPoint.x, self.startPoint.y, self.startPoint.x+self.endPoint.x, self.startPoint.y+self.endPoint.y
     
 if __name__ == '__main__':
     import sys
@@ -221,14 +251,15 @@ if __name__ == '__main__':
     view.setScene(scene)
     view.setRenderHint(QPainter.Antialiasing)
     
-    #todo: antialiasing
-    
     ccs = CartesianCoordinateSystemWidget(width, height, 10, -2,4,-1,10)
   
     
+    # eieiei, dependent points have coordinates *relative* to parent point.. :-S
     point1 = ccs.addPoint(3,3,10)
-    point2 = ccs.addPointDependent(1,1,10,point1)
-    point3 = ccs.addPointDependent(-1,0,10,point2)
+    point2 = ccs.addPointDependent(point1,1,1,10)
+    point3 = ccs.addPointDependent(point2,-1,0,10,0,0,100)
+    
+    line1 = ccs.addLineDependent(point1,point2)
     
     scene.addItem(ccs)
     
