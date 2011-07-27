@@ -148,17 +148,23 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         p = self.toItemCoord(x,y)
         x = p.x() - size / 2
         y = p.y() - size / 2
-        point = PointMovable(self,x,y,size,red,green,blue)
+        point = PointMovable(self, self,x,y,size,red,green,blue)
         return point
         
     def addPointDependent(self, parent, x,y, size,red=0,green=100,blue=0):
         p = self.toItemCoord(x,y)
         x = p.x()
         y = p.y()
-        return PointMovable(parent, x,y,size,red,green,blue)
+        return PointMovable(self, parent, x,y,size,red,green,blue)
         
     def addLineDependent(self, startPoint, endPoint):
-        return LineAutoMove(startPoint, endPoint)
+        line = LineAutoMove(startPoint, endPoint, self)
+        
+        # workaround, need to be lists of children
+        startPoint.child = line
+        endPoint.child = line
+        
+        return line
 
 # movable Point, by coordinate system automatically positioned.
 # has coordinate system as parent (at the moment, every class could
@@ -168,16 +174,23 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
 class PointMovable(QGraphicsItem):
     """Defines a movable point. """
     
-    def __init__(self, parent, x, y, size, red=0, green=255, blue=0):
+    def __init__(self, ccs, parent, x, y, size, red=0, green=255, blue=0):
         super(PointMovable, self).__init__(parent)
         
         self.Rect = QRectF(0, 0, size, size)
         
         self.color = QColor(red, green, blue)
+        self.parent = parent
         
         self.x = x
         self.y = y
         self.setPos(QPointF(self.x, self.y))
+        
+        self.ccs = ccs
+        
+        # workaround: children need to be a list
+        # these are elements that need updates if point has moved
+        self.child = None
         
     def boundingRect(self):
         return self.Rect
@@ -211,29 +224,39 @@ class PointMovable(QGraphicsItem):
         
         self.setPos(QPointF(self.x, self.y))
         
+        # if a points moves, the whole coordinate system is updated.
+        # I will have to investigate how terrible the performance penalty is.
+        self.ccs.update()
+        
 class LineAutoMove(QGraphicsItem):
     """Defines a line by two points. If points are moved, line follows these movements."""
     
-    def __init__(self, startPoint, endPoint):
+    def __init__(self, startPoint, endPoint, coordinateSystem):
         super(LineAutoMove, self).__init__(startPoint)
         
         self.startPoint = startPoint
         self.endPoint = endPoint
+        self.coordinateSystem = coordinateSystem
         
-        self.Rect = QRectF(0,0, endPoint.x,endPoint.y)
+        self.Rect = QRectF(0,0,self.endPoint.x,self.endPoint.y)
         
         self.color = QColor(255,0,0)
         
+        self.rot = 100
+        
     def boundingRect(self):
         return self.Rect
+
         
-    def paint(self, painter, option, widget=None):
+        
+    def paint(self, painter, option, widget=None):        
         painter.setPen(QColor("orange"))
         
         # as soon as dependent points are *not relative* to parent points any more,
         # this needs to be changed.
         painter.drawLine(QLineF(0, 0, self.endPoint.x, self.endPoint.y))
-        print self.startPoint.x, self.startPoint.y, self.startPoint.x+self.endPoint.x, self.startPoint.y+self.endPoint.y
+        painter.drawRect(0,0, self.endPoint.x, self.endPoint.y)
+        #~ print self.startPoint.x, self.startPoint.y, self.startPoint.x+self.endPoint.x, self.startPoint.y+self.endPoint.y
     
 if __name__ == '__main__':
     import sys
