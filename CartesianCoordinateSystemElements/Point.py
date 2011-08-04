@@ -4,7 +4,7 @@ from PyQt4.QtCore import (Qt, QRectF, QPointF)
 from PyQt4.QtGui import (QGraphicsItem, QColor, QBrush)
 
 class Point(QGraphicsItem):
-    """Defines a movable point. """
+    """Defines a movable point."""
     
     def __init__(self, ccs, parent, x, y, size, red=0, green=255, blue=0):
         super(Point, self).__init__(parent)
@@ -20,9 +20,7 @@ class Point(QGraphicsItem):
         
         self.ccs = ccs
         
-        # workaround: children need to be a list
-        # these are elements that need updates if point has moved
-        self.child = None
+        self.leftMouseButtonPressed = None
         
     def boundingRect(self):
         return self.Rect
@@ -32,30 +30,29 @@ class Point(QGraphicsItem):
         painter.setBrush(QBrush(self.color))
         painter.drawEllipse(self.Rect)
         
-    # at the moment, point is movable by either left or right
-    # mouse click. hm...
+    # point moves on left click
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:
-            print 'left click'
-        elif e.button() == Qt.RightButton:
-            print "right click"
-        else:
-            print "other click"
-        
-        # save where in Item mouse was clicked
-        self.xOnWidget = e.pos().x()
-        self.yOnWidget = e.pos().y()
+            # save where in Item mouse was clicked
+            self.xOnWidget = e.pos().x()
+            self.yOnWidget = e.pos().y()
+            self.leftMouseButtonPressed = 1
             
     def mouseMoveEvent(self, e):
         
-        x_move = e.pos().x() - self.xOnWidget
-        y_move = e.pos().y() - self.yOnWidget
+        if self.leftMouseButtonPressed:
         
-        self.x = self.x + x_move
-        self.y = self.y + y_move
+            x_move = e.pos().x() - self.xOnWidget
+            y_move = e.pos().y() - self.yOnWidget
+            
+            self.x = self.x + x_move
+            self.y = self.y + y_move
+            
+            self.setPos(QPointF(self.x, self.y))
+            
+            # if a points moves, the whole coordinate system is updated.
+            # I will have to investigate how terrible the performance penalty is.
+            self.ccs.update()
         
-        self.setPos(QPointF(self.x, self.y))
-        
-        # if a points moves, the whole coordinate system is updated.
-        # I will have to investigate how terrible the performance penalty is.
-        self.ccs.update()
+    def mouseReleaseEvent(self, e):
+        self.leftMouseButtonPressed = None
