@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from PyQt4.QtCore import (Qt, QRectF, QPointF, QLineF, QTimer, QObject, SIGNAL, QString)
+from PyQt4.QtCore import (Qt, QRectF, QPointF)
 from PyQt4.QtGui import (QGraphicsItem, QColor, QBrush)
 
 class Point(QGraphicsItem):
