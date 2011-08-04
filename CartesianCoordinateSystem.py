@@ -41,6 +41,8 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         self.tickXOffset    = tickXOffset
         self.tickYOffset    = tickYOffset
         
+        self.__coordinateSystem = 1
+        
         # todo: investigate why QRectF needs to be larger than
         # expected.. (does it?!)
         self.Rect = QRectF(-width, -height, width*2, height*2)
@@ -161,7 +163,11 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         return Point(self, parent, x,y,size,red,green,blue)
         
     def addLineDependent(self, startPoint, endPoint):
-        line = Line(startPoint, endPoint, self)
+        line = Line(
+            startPoint, 
+            endPoint, 
+            coordinateSystem = self
+        )
         
         # workaround, need to be lists of children
         startPoint.child = line
@@ -186,9 +192,8 @@ if __name__ == '__main__':
     view.setRenderHint(QPainter.Antialiasing)
     
     ccs = CartesianCoordinateSystemWidget(width, height, 10, -2,4,-1,10)
-  
     
-    # eieiei, dependent points have coordinates *relative* to parent point.. :-S
+    # coordinates are always relative to coordinate system, as it should be
     point1 = ccs.addPoint(3,3,10)
     point2 = ccs.addPointDependent(point1,1,1,10)
     point3 = ccs.addPointDependent(point2,-1,0,10,0,0,100)
