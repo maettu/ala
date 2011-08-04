@@ -9,6 +9,8 @@ from PyQt4.QtCore import (Qt, QRectF, QPointF, QLineF, QTimer, QObject, SIGNAL, 
 from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView, 
     QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout, QBrush, QPainter)
 
+from CartesianCoordinateSystemElements.Point import Point
+
 class CartesianCoordinateSystemWidget(QGraphicsItem):
     """This widget is used to draw items on it. It shows axis, grid
     (if desired) and provides the ability to draw items on items
@@ -148,14 +150,14 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         p = self.toItemCoord(x,y)
         x = p.x() - size / 2
         y = p.y() - size / 2
-        point = PointMovable(self, self,x,y,size,red,green,blue)
+        point = Point(self, self,x,y,size,red,green,blue)
         return point
         
     def addPointDependent(self, parent, x,y, size,red=0,green=100,blue=0):
         p = self.toItemCoord(x,y)
         x = p.x()
         y = p.y()
-        return PointMovable(self, parent, x,y,size,red,green,blue)
+        return Point(self, parent, x,y,size,red,green,blue)
         
     def addLineDependent(self, startPoint, endPoint):
         line = LineAutoMove(startPoint, endPoint, self)
@@ -165,68 +167,6 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         endPoint.child = line
         
         return line
-
-# movable Point, by coordinate system automatically positioned.
-# has coordinate system as parent (at the moment, every class could
-# instantiate PointMovable)
-
-# should go into separate file, I suppose
-class PointMovable(QGraphicsItem):
-    """Defines a movable point. """
-    
-    def __init__(self, ccs, parent, x, y, size, red=0, green=255, blue=0):
-        super(PointMovable, self).__init__(parent)
-        
-        self.Rect = QRectF(0, 0, size, size)
-        
-        self.color = QColor(red, green, blue)
-        self.parent = parent
-        
-        self.x = x
-        self.y = y
-        self.setPos(QPointF(self.x, self.y))
-        
-        self.ccs = ccs
-        
-        # workaround: children need to be a list
-        # these are elements that need updates if point has moved
-        self.child = None
-        
-    def boundingRect(self):
-        return self.Rect
-        
-    def paint(self, painter, option, widget=None):
-        painter.setPen(Qt.NoPen)
-        painter.setBrush(QBrush(self.color))
-        painter.drawEllipse(self.Rect)
-        
-    # at the moment, point is movable by either left or right
-    # mouse click. hm...
-    def mousePressEvent(self, e):
-        if e.button() == Qt.LeftButton:
-            print 'left click'
-        elif e.button() == Qt.RightButton:
-            print "right click"
-        else:
-            print "other click"
-        
-        # save where in Item mouse was clicked
-        self.xOnWidget = e.pos().x()
-        self.yOnWidget = e.pos().y()
-            
-    def mouseMoveEvent(self, e):
-        
-        x_move = e.pos().x() - self.xOnWidget
-        y_move = e.pos().y() - self.yOnWidget
-        
-        self.x = self.x + x_move
-        self.y = self.y + y_move
-        
-        self.setPos(QPointF(self.x, self.y))
-        
-        # if a points moves, the whole coordinate system is updated.
-        # I will have to investigate how terrible the performance penalty is.
-        self.ccs.update()
         
 class LineAutoMove(QGraphicsItem):
     """Defines a line by two points. If points are moved, line follows these movements."""
