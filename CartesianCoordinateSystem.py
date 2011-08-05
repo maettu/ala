@@ -168,11 +168,6 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             endPoint, 
             coordinateSystem = self
         )
-        
-        # workaround, need to be lists of children
-        startPoint.child = line
-        endPoint.child = line
-        
         return line
     
 if __name__ == '__main__':

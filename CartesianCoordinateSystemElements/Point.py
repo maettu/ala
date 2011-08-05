@@ -17,14 +17,11 @@ class Point(QGraphicsItem):
         
         self.color = QColor(red, green, blue)
         self.parent = parent
-
-        # works only for grandchildren of ccs :-)
-        #~ if parent != ccs:
-            #~ x = x - parent.x
-            #~ y = y - parent.y
         
         self.x = x
         self.y = y
+        
+        self.size = size
         
         # we need coordinates relative to ccs, while chilren of other
         # points get coordinates relative to their parent.
@@ -57,7 +54,7 @@ class Point(QGraphicsItem):
     # point moves on left click
     def mousePressEvent(self, e):
         if e.button() == Qt.LeftButton:
-            # save where in Item mouse was clicked
+            # save where in item the mouse was clicked
             self.xOnWidget = e.pos().x()
             self.yOnWidget = e.pos().y()
             self.leftMouseButtonPressed = 1

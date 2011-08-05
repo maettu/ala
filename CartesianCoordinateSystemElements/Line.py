@@ -29,6 +29,10 @@ class Line(QGraphicsItem):
         
         # as soon as dependent points are *not relative* to parent points any more,
         # this needs to be changed.
-        painter.drawLine(QLineF(0, 0, self.endPoint.x, self.endPoint.y))
-        painter.drawRect(0,0, self.endPoint.x, self.endPoint.y)
-        #~ print self.startPoint.x, self.startPoint.y, self.startPoint.x+self.endPoint.x, self.startPoint.y+self.endPoint.y
+        painter.drawLine(QLineF(
+                            0 +                 self.startPoint.size/2, 
+                            0 +                 self.startPoint.size/2, 
+                            
+                            self.endPoint.x +   self.endPoint.size/2, 
+                            self.endPoint.y +   self.endPoint.size/2
+        ))
