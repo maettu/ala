@@ -41,8 +41,6 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         self.tickXOffset    = tickXOffset
         self.tickYOffset    = tickYOffset
         
-        self.__coordinateSystem = 1
-        
         # todo: investigate why QRectF needs to be larger than
         # expected.. (does it?!)
         self.Rect = QRectF(-width, -height, width*2, height*2)
@@ -96,7 +94,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
     # i.e. give it x = 2, y = 5 and receive 150,370 or something alike.
     
     # this method supposedly needs to go in separate helper class
-    def toItemCoord(self, x, y):
+    def toMainWidgetCoord(self, x, y):
         # number of items is max - min, 12 - -3 = 15 :-)
         numberXItems = self.xMax - self.xMin
         numberYItems = self.yMax - self.yMin
@@ -119,12 +117,12 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 painter.setPen(normalLineCol)
                 
             painter.drawLine(
-                self.toItemCoord(i,self.yMin), 
-                self.toItemCoord(i,self.yMax)
+                self.toMainWidgetCoord(i,self.yMin), 
+                self.toMainWidgetCoord(i,self.yMax)
             )
             
-            tickCoord = self.toItemCoord(i, 0)
-            tickCoord += self.toItemCoord(self.tickXOffset, self.tickYOffset)
+            tickCoord = self.toMainWidgetCoord(i, 0)
+            tickCoord += self.toMainWidgetCoord(self.tickXOffset, self.tickYOffset)
             painter.drawText(
                 tickCoord,
                 QString.number(i)
@@ -138,26 +136,26 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 painter.setPen(normalLineCol)
             
             painter.drawLine(
-                self.toItemCoord(self.xMin,i), 
-                self.toItemCoord(self.xMax,i)
+                self.toMainWidgetCoord(self.xMin,i), 
+                self.toMainWidgetCoord(self.xMax,i)
             )
             
-            tickCoord = self.toItemCoord(0,i)
-            tickCoord += self.toItemCoord(self.tickXOffset, self.tickYOffset)
+            tickCoord = self.toMainWidgetCoord(0,i)
+            tickCoord += self.toMainWidgetCoord(self.tickXOffset, self.tickYOffset)
             painter.drawText(
                 tickCoord,
                 QString.number(i)
             )
             
     def addPoint(self, x,y, size, red=0,green=200,blue=0):
-        p = self.toItemCoord(x,y)
+        p = self.toMainWidgetCoord(x,y)
         x = p.x() - size / 2
         y = p.y() - size / 2
         point = Point(self, self,x,y,size,red,green,blue)
         return point
         
     def addPointDependent(self, parent, x,y, size,red=0,green=100,blue=0):
-        p = self.toItemCoord(x,y)
+        p = self.toMainWidgetCoord(x,y)
         x = p.x()
         y = p.y()
         return Point(self, parent, x,y,size,red,green,blue)

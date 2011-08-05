@@ -71,6 +71,8 @@ class Point(QGraphicsItem):
             
             self.setPos(QPointF(self.x, self.y))
             
+            print self.x, self.y
+            
             # if a points moves, the whole coordinate system is updated.
             # I will have to investigate how terrible the performance penalty is.
             self.ccs.update()

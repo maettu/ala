@@ -30,8 +30,8 @@ class Line(QGraphicsItem):
         # as soon as dependent points are *not relative* to parent points any more,
         # this needs to be changed.
         painter.drawLine(QLineF(
-                            0 +                 self.startPoint.size/2, 
-                            0 +                 self.startPoint.size/2, 
+                            0               +   self.startPoint.size/2, 
+                            0               +   self.startPoint.size/2, 
                             
                             self.endPoint.x +   self.endPoint.size/2, 
                             self.endPoint.y +   self.endPoint.size/2
