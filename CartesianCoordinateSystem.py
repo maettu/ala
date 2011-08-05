@@ -12,6 +12,8 @@ from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView,
 from CartesianCoordinateSystemElements.Point import Point
 from CartesianCoordinateSystemElements.Line  import Line
 
+import Helper.CoordinateSystemTransformation as CST
+
 class CartesianCoordinateSystemWidget(QGraphicsItem):
     """This widget is used to draw items on it. It shows axis, grid
     (if desired) and provides the ability to draw items on items
@@ -88,23 +90,6 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
     # implementation mandatory
     def boundingRect(self):
         return self.Rect
-        
-    # Translates cartesian coordinates (from own coord. system)
-    # to item coordinates
-    # i.e. give it x = 2, y = 5 and receive 150,370 or something alike.
-    
-    # this method supposedly needs to go in separate helper class
-    def toMainWidgetCoord(self, x, y):
-        # number of items is max - min, 12 - -3 = 15 :-)
-        numberXItems = self.xMax - self.xMin
-        numberYItems = self.yMax - self.yMin
-        
-        # width / countNumber -> width of one item
-        xItem = self.width / numberXItems * x
-        yItem = - (self.height/ numberYItems * y)
-        
-        return QPointF(xItem, yItem)
-        
 
     def paint(self, painter, option, widget=None):
         ordinateColor = QPen(QColor(255, 0, 0))
@@ -117,12 +102,12 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 painter.setPen(normalLineCol)
                 
             painter.drawLine(
-                self.toMainWidgetCoord(i,self.yMin), 
-                self.toMainWidgetCoord(i,self.yMax)
+                CST.toMainWidgetCoord(self, i,self.yMin), 
+                CST.toMainWidgetCoord(self, i,self.yMax)
             )
             
-            tickCoord = self.toMainWidgetCoord(i, 0)
-            tickCoord += self.toMainWidgetCoord(self.tickXOffset, self.tickYOffset)
+            tickCoord = CST.toMainWidgetCoord(self, i, 0)
+            tickCoord += CST.toMainWidgetCoord(self, self.tickXOffset, self.tickYOffset)
             painter.drawText(
                 tickCoord,
                 QString.number(i)
@@ -136,26 +121,26 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 painter.setPen(normalLineCol)
             
             painter.drawLine(
-                self.toMainWidgetCoord(self.xMin,i), 
-                self.toMainWidgetCoord(self.xMax,i)
+                CST.toMainWidgetCoord(self, self.xMin,i), 
+                CST.toMainWidgetCoord(self, self.xMax,i)
             )
             
-            tickCoord = self.toMainWidgetCoord(0,i)
-            tickCoord += self.toMainWidgetCoord(self.tickXOffset, self.tickYOffset)
+            tickCoord = CST.toMainWidgetCoord(self, 0,i)
+            tickCoord += CST.toMainWidgetCoord(self, self.tickXOffset, self.tickYOffset)
             painter.drawText(
                 tickCoord,
                 QString.number(i)
             )
             
     def addPoint(self, x,y, size, red=0,green=200,blue=0):
-        p = self.toMainWidgetCoord(x,y)
+        p = CST.toMainWidgetCoord(self, x,y)
         x = p.x() - size / 2
         y = p.y() - size / 2
         point = Point(self, self,x,y,size,red,green,blue)
         return point
         
     def addPointDependent(self, parent, x,y, size,red=0,green=100,blue=0):
-        p = self.toMainWidgetCoord(x,y)
+        p = CST.toMainWidgetCoord(self, x,y)
         x = p.x()
         y = p.y()
         return Point(self, parent, x,y,size,red,green,blue)
