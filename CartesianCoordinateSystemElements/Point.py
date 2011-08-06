@@ -3,6 +3,8 @@
 from PyQt4.QtCore import (Qt, QRectF, QPointF)
 from PyQt4.QtGui import (QGraphicsItem, QColor, QBrush)
 
+import Helper.CoordinateSystemTransformation as CST
+
 class Point(QGraphicsItem):
     """Defines a movable point."""
     
@@ -13,11 +15,12 @@ class Point(QGraphicsItem):
         # every time it is moved, it jumps back to 0/0 of its parent. (?!)
         #~ self.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
         
-        self.Rect = QRectF(0, 0, size, size)
+        self.Rect = QRectF(-size/2, -size/2, size, size)
         
         self.color = QColor(red, green, blue)
         self.parent = parent
         
+        # x and y are in own cartesian coordinate system.
         self.x = x
         self.y = y
         
@@ -26,8 +29,9 @@ class Point(QGraphicsItem):
         # we need coordinates relative to ccs, while chilren of other
         # points get coordinates relative to their parent.
         self.__calculateCoordinates(parent, ccs)
-
-        self.setPos(QPointF(self.x, self.y))
+        
+        # coordinates go through conversion when item is placed or painted.
+        self.setPos(CST.toCcsCoord(ccs, self.x,self.y))
         
         self.ccs = ccs
         
@@ -63,15 +67,21 @@ class Point(QGraphicsItem):
         
         if self.leftMouseButtonPressed:
         
+            # these calculations are in widget coordinates.
             x_move = e.pos().x() - self.xOnWidget
             y_move = e.pos().y() - self.yOnWidget
             
-            self.x = self.x + x_move
-            self.y = self.y + y_move
+            p = CST.toCcsCoord(self.ccs, self.x, self.y)
             
-            self.setPos(QPointF(self.x, self.y))
+            x = p.x() + x_move
+            y = p.y() + y_move
             
-            print self.x, self.y
+            self.setPos(QPointF(x, y))
+            
+            # self.x and self.y need to be adjusted, too.
+            p = CST.fromCcsCoord(self.ccs, x,y)
+            self.x = p.x()
+            self.y = p.y()
             
             # if a points moves, the whole coordinate system is updated.
             # I will have to investigate how terrible the performance penalty is.

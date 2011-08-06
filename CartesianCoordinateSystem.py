@@ -15,8 +15,8 @@ from CartesianCoordinateSystemElements.Line  import Line
 import Helper.CoordinateSystemTransformation as CST
 
 class CartesianCoordinateSystemWidget(QGraphicsItem):
-    """This widget is used to draw items on it. It shows axis, grid
-    (if desired) and provides the ability to draw items on items
+    """This widget is used to draw items on. It shows axis, grid
+    (if desired) and provides the ability to draw items
     according to its coordinate system. It translates the underlying
     coordinate system into its own according to users settings."""
     
@@ -102,12 +102,12 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 painter.setPen(normalLineCol)
                 
             painter.drawLine(
-                CST.toMainWidgetCoord(self, i,self.yMin), 
-                CST.toMainWidgetCoord(self, i,self.yMax)
+                CST.toCcsCoord(self, i,self.yMin), 
+                CST.toCcsCoord(self, i,self.yMax)
             )
             
-            tickCoord = CST.toMainWidgetCoord(self, i, 0)
-            tickCoord += CST.toMainWidgetCoord(self, self.tickXOffset, self.tickYOffset)
+            tickCoord = CST.toCcsCoord(self, i, 0)
+            tickCoord += CST.toCcsCoord(self, self.tickXOffset, self.tickYOffset)
             painter.drawText(
                 tickCoord,
                 QString.number(i)
@@ -121,35 +121,29 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 painter.setPen(normalLineCol)
             
             painter.drawLine(
-                CST.toMainWidgetCoord(self, self.xMin,i), 
-                CST.toMainWidgetCoord(self, self.xMax,i)
+                CST.toCcsCoord(self, self.xMin,i), 
+                CST.toCcsCoord(self, self.xMax,i)
             )
             
-            tickCoord = CST.toMainWidgetCoord(self, 0,i)
-            tickCoord += CST.toMainWidgetCoord(self, self.tickXOffset, self.tickYOffset)
+            tickCoord = CST.toCcsCoord(self, 0,i)
+            tickCoord += CST.toCcsCoord(self, self.tickXOffset, self.tickYOffset)
             painter.drawText(
                 tickCoord,
                 QString.number(i)
             )
             
     def addPoint(self, x,y, size, red=0,green=200,blue=0):
-        p = CST.toMainWidgetCoord(self, x,y)
-        x = p.x() - size / 2
-        y = p.y() - size / 2
         point = Point(self, self,x,y,size,red,green,blue)
         return point
         
     def addPointDependent(self, parent, x,y, size,red=0,green=100,blue=0):
-        p = CST.toMainWidgetCoord(self, x,y)
-        x = p.x()
-        y = p.y()
         return Point(self, parent, x,y,size,red,green,blue)
         
     def addLineDependent(self, startPoint, endPoint):
         line = Line(
             startPoint, 
             endPoint, 
-            coordinateSystem = self
+            ccs = self
         )
         return line
     
