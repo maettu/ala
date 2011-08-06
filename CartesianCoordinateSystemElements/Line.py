@@ -34,6 +34,7 @@ class Line(QGraphicsItem):
         # as soon as dependent points are *not relative* to parent points any more,
         # this needs to be changed.
 
+        sp = CST.toCcsCoord(self.ccs, self.startPoint.x, self.startPoint.y)
         ep = CST.toCcsCoord(self.ccs, self.endPoint.x, self.endPoint.y)
         
-        painter.drawLine(QLineF(0, 0, ep.x(), ep.y() ))
+        painter.drawLine(QLineF(0, 0, ep.x()-sp.x(), ep.y()-sp.y() ))

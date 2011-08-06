@@ -28,24 +28,17 @@ class Point(QGraphicsItem):
         
         # we need coordinates relative to ccs, while chilren of other
         # points get coordinates relative to their parent.
-        self.__calculateCoordinates(parent, ccs)
+        #~ self.__calculateCoordinates(parent, ccs)
         
         # coordinates go through conversion when item is placed or painted.
-        self.setPos(CST.toCcsCoord(ccs, self.x,self.y))
+        self.setPos(CST.toCcsCoord(ccs, self.x,self.y, self, parent))
         
         self.ccs = ccs
+        self.parent = parent
         
         self.leftMouseButtonPressed = None
-    
-    # calculates coordinates so that item is positioned according
-    # to ccs instead of parent.
-    # To ensure quasi indefinite sub children this is made recursive
-    def __calculateCoordinates(self, parent, ccs):
-        if parent != ccs:
-            self.x = self.x - parent.x
-            self.y = self.y - parent.y
-            self.__calculateCoordinates(parent.parent, ccs)
             
+        print self.x, self.y
         
     def boundingRect(self):
         return self.Rect
@@ -71,7 +64,7 @@ class Point(QGraphicsItem):
             x_move = e.pos().x() - self.xOnWidget
             y_move = e.pos().y() - self.yOnWidget
             
-            p = CST.toCcsCoord(self.ccs, self.x, self.y)
+            p = CST.toCcsCoord(self.ccs, self.x, self.y, self, self.parent)
             
             x = p.x() + x_move
             y = p.y() + y_move
@@ -79,9 +72,13 @@ class Point(QGraphicsItem):
             self.setPos(QPointF(x, y))
             
             # self.x and self.y need to be adjusted, too.
-            p = CST.fromCcsCoord(self.ccs, x,y)
+            p = CST.fromCcsCoord(self.ccs, x,y, self, self.parent)
             self.x = p.x()
             self.y = p.y()
+            
+            # todo: update children's x and y.. :-S
+            
+            print self.x, self.y
             
             # if a points moves, the whole coordinate system is updated.
             # I will have to investigate how terrible the performance penalty is.
