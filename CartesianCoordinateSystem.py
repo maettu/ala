@@ -134,10 +134,22 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             
     def addPoint(self, x,y, size, red=0,green=200,blue=0):
         point = Point(self, self,x,y,size,red,green,blue)
+        # After addPointDependet is removed, 2nd parameter becomes obsolete(?)
         return point
-        
-    def addPointDependent(self, parent, x,y, size,red=0,green=100,blue=0):
-        return Point(self, parent, x,y,size,red,green,blue)
+    # This Point is not really needed. It makes for an
+    # linearily dependet point. Who wanted this?!
+    # Interesting are points with a dependence according to a
+    # mathematical function.
+    def addPointDependent( self, parent, x,y, size,red=0,green=100,blue=0 ):
+        return Point( self, parent, x,y,size,red,green,blue )
+
+    def addPointXFunction( self, parent, factor, size,red=200,green=0,blue=0 ):
+        # make a point of its own; directly dependent to coordinate system
+        point = Point( self, self, parent.x,parent.y*factor,size,red,green,blue )
+        # make itself a child of other point (no type checking so far)
+        parent.addChildPoint(point)
+        return point
+
         
     def addLineDependent(self, startPoint, endPoint):
         line = Line(
@@ -169,7 +181,8 @@ if __name__ == '__main__':
     point1 = ccs.addPoint(3,3,10)
     point2 = ccs.addPointDependent(point1,1,1,10)
     point3 = ccs.addPointDependent(point2,-1,0,10,0,0,100)
-    
+    point4 = ccs.addPointXFunction(point1, 2,10)
+
     line1 = ccs.addLineDependent(point1,point2)
     
     scene.addItem(ccs)
@@ -184,6 +197,7 @@ if __name__ == '__main__':
     dialog.show()
     
     app.exec_()
+    
     
     
     

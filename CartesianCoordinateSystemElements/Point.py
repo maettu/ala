@@ -10,35 +10,37 @@ class Point(QGraphicsItem):
     
     def __init__(self, ccs, parent, x, y, size, red=0, green=255, blue=0):
         super(Point, self).__init__(parent)
-        
-        # does not really work for children of other points
-        # every time it is moved, it jumps back to 0/0 of its parent. (?!)
-        #~ self.setFlags(QGraphicsItem.ItemIsMovable | QGraphicsItem.ItemIsSelectable)
-        
+               
         self.Rect = QRectF(-size/2, -size/2, size, size)
         
         self.color = QColor(red, green, blue)
         self.parent = parent
         
-        # x and y are in own cartesian coordinate system.
+        # x and y are in cartesian coordinate system.
         self.x = x
         self.y = y
         
+        self.ccs  = ccs
         self.size = size
-        
-        # we need coordinates relative to ccs, while chilren of other
-        # points get coordinates relative to their parent.
-        #~ self.__calculateCoordinates(parent, ccs)
-        
-        # coordinates go through conversion when item is placed or painted.
-        self.setPos(CST.toCcsCoord(ccs, self.x,self.y, self, parent))
         
         self.ccs = ccs
         self.parent = parent
         
+        # coordinates go through conversion when item is placed or painted.
+        self.setPos(CST.toCcsCoord(self.ccs, self.x,self.y, self, parent))
+       
         self.leftMouseButtonPressed = None
-            
-        print self.x, self.y
+        
+        # All children of this point. These get updated when point
+        # moves
+        self.children = []
+
+    def addChildPoint(self, child):
+        self.children.append(child)
+
+    def removeChildPoint(self, child):
+        # TODO
+        pass
         
     def boundingRect(self):
         return self.Rect
@@ -48,8 +50,8 @@ class Point(QGraphicsItem):
         painter.setBrush(QBrush(self.color))
         painter.drawEllipse(self.Rect)
         
-    # point moves on left click
     def mousePressEvent(self, e):
+        # point moves on left click
         if e.button() == Qt.LeftButton:
             # save where in item the mouse was clicked
             self.xOnWidget = e.pos().x()
@@ -76,13 +78,31 @@ class Point(QGraphicsItem):
             self.x = p.x()
             self.y = p.y()
             
-            # todo: update children's x and y.. :-S
-            
-            print self.x, self.y
-            
+            #upadate functionally dependent children
+            # TODO: child keeps x, only updates according to relative
+            # movement.
+            for child in self.children:
+                # child's x = parent's x
+                child.x = self.x
+                # child's y = parent's y * function TODO
+                child.y = self.x**2 
+
+                child.setPos( CST.toCcsCoord(
+                    self.ccs, child.x,child.y ))
+
             # if a points moves, the whole coordinate system is updated.
-            # I will have to investigate how terrible the performance penalty is.
-            self.ccs.update()
+            # I will have to investigate how terrible the 
+            # performance penalty is.
+            #self.ccs.update()
         
     def mouseReleaseEvent(self, e):
         self.leftMouseButtonPressed = None
+
+    def set_x(self, x):
+        self.x = x
+
+    def set_y(self, y):
+        self.y = y
+        
+    def update(self):
+        print "huhu"
