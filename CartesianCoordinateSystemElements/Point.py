@@ -44,6 +44,28 @@ class Point(QGraphicsItem):
         
     def boundingRect(self):
         return self.Rect
+
+    def calculatePosition(self, e):
+        """Calculates its position after a move. Can easily
+        overwritten by subclasses to get different behaviour"""
+
+        # these calculations are in widget coordinates.
+        x_move = e.pos().x() - self.xOnWidget
+        y_move = e.pos().y() - self.yOnWidget
+            
+        p = CST.toCcsCoord( self.ccs, self.x, self.y, self, self.parent )
+           
+        x = p.x() + x_move
+        y = p.y() + y_move
+           
+        self.setPos(QPointF(x, y))
+           
+        # self.x and self.y need to be adjusted, too.
+        p = CST.fromCcsCoord( self.ccs, x,y, self, self.parent )
+        self.x = p.x()
+        self.y = p.y()
+
+
         
     def paint(self, painter, option, widget=None):
         painter.setPen(Qt.NoPen)
@@ -62,39 +84,19 @@ class Point(QGraphicsItem):
         
         if self.leftMouseButtonPressed:
         
-            # these calculations are in widget coordinates.
-            x_move = e.pos().x() - self.xOnWidget
-            y_move = e.pos().y() - self.yOnWidget
-            
-            p = CST.toCcsCoord(self.ccs, self.x, self.y, self, self.parent)
-            
-            x = p.x() + x_move
-            y = p.y() + y_move
-            
-            self.setPos(QPointF(x, y))
-            
-            # self.x and self.y need to be adjusted, too.
-            p = CST.fromCcsCoord(self.ccs, x,y, self, self.parent)
-            self.x = p.x()
-            self.y = p.y()
+            self.calculatePosition(e)
             
             #upadate functionally dependent children
             # TODO: child keeps x, only updates according to relative
             # movement.
             for child in self.children:
-                # everything mentioned to be done by child on its own
-                # regard
-
-                # child's x = parent's x
-                # child.x = self.x
-                # child's y = parent's y * function TODO
-                # child.y = self.x**2 
-
                 child.updateYourself(self.x)
 
             # if a points moves, the whole coordinate system is updated.
             # I will have to investigate how terrible the 
             # performance penalty is.
+            # This is unneccessary if we update children manually.
+            # Even better. :-)
             #self.ccs.update()
         
     def mouseReleaseEvent(self, e):
