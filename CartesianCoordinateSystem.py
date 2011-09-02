@@ -45,9 +45,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         self.tickXOffset    = tickXOffset
         self.tickYOffset    = tickYOffset
         
-        # todo: investigate why QRectF needs to be larger than
-        # expected.. (does it?!)
-        self.Rect = QRectF(-width, -height, width*2, height*2)
+        self.Rect = QRectF( -width/2, -height/2 , width, height)
         
         # centre of logical coordinate system gets
         # positioned where (0,0) of the origin of
@@ -150,7 +148,8 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         point = PointXFunction( self, self, parent.x,parent.y*factor,size,red,green,blue )
         # dependent point probably has an y which is impossible. So just
         # silently set to function value.
-        #point.updateYourself(parent.x)
+        point.setPosition(parent.x)
+
         # make itself a child of other point (no type checking so far)
         parent.addChildPoint(point)
         

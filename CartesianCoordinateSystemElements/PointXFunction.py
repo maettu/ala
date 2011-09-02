@@ -29,7 +29,12 @@ class PointXFunction( Point ):
         self.setPos( CST.toCcsCoord(
             self.ccs, self.x, self.y )
         )
-
+    def setPosition( self, x ):
+        self.x = x
+        self.y = self.x**2
+        self.setPos ( CST.toCcsCoord(
+            self.ccs, self.x, self.y )
+        )
 
     def updateYourself( self, xDelta, yDelta ):
         # TODO point moves *relatively* to parent, does not just take
