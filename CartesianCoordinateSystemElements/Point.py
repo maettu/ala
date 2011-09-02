@@ -82,13 +82,15 @@ class Point(QGraphicsItem):
             # TODO: child keeps x, only updates according to relative
             # movement.
             for child in self.children:
-                # child's x = parent's x
-                child.x = self.x
-                # child's y = parent's y * function TODO
-                child.y = self.x**2 
+                # everything mentioned to be done by child on its own
+                # regard
 
-                child.setPos( CST.toCcsCoord(
-                    self.ccs, child.x,child.y ))
+                # child's x = parent's x
+                # child.x = self.x
+                # child's y = parent's y * function TODO
+                # child.y = self.x**2 
+
+                child.updateYourself(self.x)
 
             # if a points moves, the whole coordinate system is updated.
             # I will have to investigate how terrible the 
@@ -103,6 +105,15 @@ class Point(QGraphicsItem):
 
     def set_y(self, y):
         self.y = y
-        
+    
+    # update can't easyily be called for some mysterious reason
+    # (mysterious to me, at least)
     def update(self):
+        # when will we ever see.. ?
         print "huhu"
+
+    #def updateYourself(self):
+    #    self.setPos( CST.toCcsCoord(
+    #        self.ccs, self.x,self.y )
+    #    )
+

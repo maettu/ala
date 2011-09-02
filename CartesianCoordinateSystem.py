@@ -5,11 +5,13 @@
 
 
 
+
 from PyQt4.QtCore import (Qt, QRectF, QPointF, QLineF, QTimer, QObject, SIGNAL, QString)
 from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView, 
     QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout, QBrush, QPainter)
 
 from CartesianCoordinateSystemElements.Point import Point
+from CartesianCoordinateSystemElements.PointXFunction import PointXFunction
 from CartesianCoordinateSystemElements.Line  import Line
 
 import Helper.CoordinateSystemTransformation as CST
@@ -145,11 +147,14 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
 
     def addPointXFunction( self, parent, factor, size,red=200,green=0,blue=0 ):
         # make a point of its own; directly dependent to coordinate system
-        point = Point( self, self, parent.x,parent.y*factor,size,red,green,blue )
+        point = PointXFunction( self, self, parent.x,parent.y*factor,size,red,green,blue )
+        # dependent point probably has an y which is impossible. So just
+        # silently set to function value.
+        point.updateYourself(parent.x)
         # make itself a child of other point (no type checking so far)
         parent.addChildPoint(point)
+        
         return point
-
         
     def addLineDependent(self, startPoint, endPoint):
         line = Line(
