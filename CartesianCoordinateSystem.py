@@ -150,7 +150,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         point = PointXFunction( self, self, parent.x,parent.y*factor,size,red,green,blue )
         # dependent point probably has an y which is impossible. So just
         # silently set to function value.
-        point.updateYourself(parent.x)
+        #point.updateYourself(parent.x)
         # make itself a child of other point (no type checking so far)
         parent.addChildPoint(point)
         

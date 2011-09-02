@@ -83,14 +83,17 @@ class Point(QGraphicsItem):
     def mouseMoveEvent(self, e):
         
         if self.leftMouseButtonPressed:
-        
+            x = self.x
+            y = self.y
             self.calculatePosition(e)
+            xDelta = self.x -x
+            yDelta = self.y -y
             
             #upadate functionally dependent children
             # TODO: child keeps x, only updates according to relative
             # movement.
             for child in self.children:
-                child.updateYourself(self.x)
+                child.updateYourself(xDelta, yDelta)
 
             # if a points moves, the whole coordinate system is updated.
             # I will have to investigate how terrible the 
