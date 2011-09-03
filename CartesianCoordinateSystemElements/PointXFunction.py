@@ -9,9 +9,11 @@ class PointXFunction( Point ):
 
     # TODO function as a parameter
     def __init__( self, ccs, parent, x, y, size, red=200, green=0,
-                    blue=0 ):
+                    blue=0, function = 'self.x**2' ):
         super(PointXFunction, self).__init__(ccs,
             parent, x, y, size, red, green, blue)
+
+        self.function = function
 
     def calculatePosition( self, e ):
         # only needs x_move here as y is calculated dependently on x
@@ -23,24 +25,23 @@ class PointXFunction( Point ):
 
         p = CST.fromCcsCoord( self.ccs, x, 0, self, self.parent )
         self.x = p.x()
-        # TODO function still hardcoded..
-        self.y = self.x**2
+        self.y = eval( self.function )
         
         self.setPos( CST.toCcsCoord(
             self.ccs, self.x, self.y )
         )
     def setPosition( self, x ):
         self.x = x
-        self.y = self.x**2
+        self.y = eval(self.function)
         self.setPos ( CST.toCcsCoord(
             self.ccs, self.x, self.y )
         )
 
     def updateYourself( self, xDelta, yDelta ):
-        # TODO point moves *relatively* to parent, does not just take
-        # its x value
+        # point moves relative to parent.
         self.x = self.x + xDelta
-        self.y = self.x**2
+        self.y = eval( self.function )
+        
         self.setPos( CST.toCcsCoord(
             self.ccs, self.x, self.y )
         )

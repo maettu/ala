@@ -150,7 +150,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         # silently set to function value.
         point.setPosition(parent.x)
 
-        # make itself a child of other point (no type checking so far)
+        # make itself a child of another point (no type checking so far)
         parent.addChildPoint(point)
         
         return point
@@ -161,6 +161,9 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             endPoint, 
             ccs = self
         )
+        # TODO This needs a rename..
+        startPoint.addChildPoint(line)
+        endPoint.addChildPoint(line)
         return line
     
 if __name__ == '__main__':
@@ -185,9 +188,12 @@ if __name__ == '__main__':
     point1 = ccs.addPoint(3,3,10)
     point2 = ccs.addPointDependent(point1,1,1,10)
     point3 = ccs.addPointDependent(point2,-1,0,10,0,0,100)
-    point4 = ccs.addPointXFunction(point1, 2,10)
+    
+    # two points on a function
+    point4 = ccs.addPointXFunction(point1, 1,10)
+    point5 = ccs.addPointXFunction(point4, 2,10)
 
-    line1 = ccs.addLineDependent(point1,point2)
+    line1 = ccs.addLineDependent(point4,point5)
     
     scene.addItem(ccs)
     
