@@ -13,6 +13,7 @@ from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView,
 from CartesianCoordinateSystemElements.Point import Point
 from CartesianCoordinateSystemElements.PointXFunction import PointXFunction
 from CartesianCoordinateSystemElements.Line  import Line
+from CartesianCoordinateSystemElements.PointWithXFromOneParentAndYFromAnother import PointWithXFromOneParentAndYFromAnother
 
 import Helper.CoordinateSystemTransformation as CST
 
@@ -148,9 +149,6 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
     def addPointXFunction( self, parent, x, function, size,red=200,green=0,blue=0 ):
         # make a point of its own; directly dependent to coordinate system
         point = PointXFunction( self, self, x, size,red,green,blue, function )
-        # dependent point probably has an y which is impossible. So just
-        # silently set to function value.
-        # point.setPosition(parent.x)
 
         # make itself a child of another point; or some points
         # (no type checking so far)
@@ -158,6 +156,12 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             for p in parent:
                 p.addChildPoint(point)
         
+        return point
+
+    def addPointWithXFromOnePointAndYFromAnother( self, xParent, yParent ):
+        point = PointWithXFromOneParentAndYFromAnother( self, xParent, yParent )  
+        xParent.addChildPoint(point)
+        yParent.addChildPoint(point)
         return point
         
     def addLineDependent(self, startPoint, endPoint):
@@ -195,10 +199,10 @@ if __name__ == '__main__':
     #point3 = ccs.addPointDependent(point2,-1,0,10,0,0,100)
     
     # two points on a function
-    point4 = ccs.addPointXFunction( None,    1, 'x**2', 10 )
-    point5 = ccs.addPointXFunction( [point4],  2, 'x**2', 10 )
-    #point6 = ccs.addPointDependent( point4,  2, 1     , 10 )
-    point6 = ccs.addPointXFunction( [point4,point5], 2, '1', 0 )
+    point4 = ccs.addPointXFunction( None,    1, '0.5*x**2', 10 )
+    point5 = ccs.addPointXFunction( [point4],  2, '0.5*x**2', 10 )
+    #point6 = ccs.addPointXFunction( [point4,point5], 2, '1', 0 )
+    point6 = ccs.addPointWithXFromOnePointAndYFromAnother( point5, point4 )
 
     line1 = ccs.addLineDependent( point4, point5 )
     line2 = ccs.addLineDependent( point5, point6 )

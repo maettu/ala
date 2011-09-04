@@ -7,11 +7,10 @@ class PointXFunction( Point ):
     """Defines a movable point with an y which is functionally
     dependent on its x value."""
 
-    # TODO function as a parameter
     def __init__( self, ccs, parent, x, size, red=200, green=0,
                     blue=0, function = 'x**2' ):
-        super(PointXFunction, self).__init__(ccs,
-            parent, x, 0, size, red, green, blue)
+        super( PointXFunction, self ).__init__(
+                    ccs,parent, x, 0, size, red, green, blue )
 
         self.function = function
         
