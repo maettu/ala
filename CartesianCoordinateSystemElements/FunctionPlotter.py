@@ -31,7 +31,9 @@ class FunctionPlotter( QGraphicsLineItem ):
             
         color = QPen(QColor(0, 100, 0))
         
-        sp = CST.toCcsCoord( self.ccs, self.ccs.xMin, self.ccs.yMin)
+        # x must be set, because function will most probably contain it.
+        x = self.ccs.xMin
+        sp = CST.toCcsCoord( self.ccs, x, eval( self.function ) )
         
         for xRaw in range ( self.ccs.xMin, self.ccs.xMax+1 ):
             for tiny in range ( 0 , 10 ):

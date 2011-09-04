@@ -167,11 +167,14 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         yParent.addChildPoint(point)
         return point
         
-    def addLineDependent( self, startPoint, endPoint ):
+    def addLineDependent( self, startPoint, endPoint, paintToBorder = False, showIncline = False, color = 'orange'):
         line = Line(
             startPoint, 
             endPoint, 
-            ccs = self
+            self,
+            paintToBorder,
+            showIncline,
+            color
         )
         # TODO This needs a rename..
         startPoint.addChildPoint(line)
@@ -211,12 +214,12 @@ if __name__ == '__main__':
     function = 'x**2'
     
     # two points on a function
-    point1 = ccs.addPointXFunction                          ( None,    1,   function, 10 )
+    point1 = ccs.addPointXFunction                          ( None,    1,   function, 10, 0,0,200 )
     point2 = ccs.addPointXFunction                          ( [point1],  2, function, 10 )
     # third point, invisible, to form triangle
     point3 = ccs.addPointWithXFromOnePointAndYFromAnother   ( point2, point1 )
 
-    line1 = ccs.addLineDependent( point1, point2 )
+    line1 = ccs.addLineDependent( point1, point2 , True, True, 'red')
     line2 = ccs.addLineDependent( point2, point3 )
     line3 = ccs.addLineDependent( point1, point3 )
     
