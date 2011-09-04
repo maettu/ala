@@ -145,15 +145,16 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
     def addPointDependent( self, parent, x,y, size,red=0,green=100,blue=0 ):
         return Point( self, parent, x,y,size,red,green,blue )
 
-    def addPointXFunction( self, parent, factor, size,red=200,green=0,blue=0 ):
+    def addPointXFunction( self, parent, x, factor, size,red=200,green=0,blue=0 ):
         # make a point of its own; directly dependent to coordinate system
-        point = PointXFunction( self, self, parent.x,parent.y*factor,size,red,green,blue )
+        point = PointXFunction( self, self, x, size,red,green,blue )
         # dependent point probably has an y which is impossible. So just
         # silently set to function value.
         # point.setPosition(parent.x)
 
         # make itself a child of another point (no type checking so far)
-        parent.addChildPoint(point)
+        if parent:
+            parent.addChildPoint(point)
         
         return point
         
@@ -187,23 +188,23 @@ if __name__ == '__main__':
     ccs = CartesianCoordinateSystemWidget(width, height, 10, -2,4,-1,10)
     
     # coordinates are always relative to coordinate system, as it should be
-    point1 = ccs.addPoint(3,3,10)
-    point2 = ccs.addPointDependent(point1,1,1,10)
-    point3 = ccs.addPointDependent(point2,-1,0,10,0,0,100)
+    #point1 = ccs.addPoint(3,3,10)
+    #point2 = ccs.addPointDependent(point1,1,1,10)
+    #point3 = ccs.addPointDependent(point2,-1,0,10,0,0,100)
     
     # two points on a function
-    point4 = ccs.addPointXFunction(point1, 1,10)
-    point5 = ccs.addPointXFunction(point4, 2,10)
+    point4 = ccs.addPointXFunction( None,    1, 'x**2', 10 )
+    point5 = ccs.addPointXFunction( point4,  2, 'x**2', 10 )
 
-    line1 = ccs.addLineDependent(point4,point5)
+    line1 = ccs.addLineDependent( point4,point5 )
     
-    scene.addItem(ccs)
+    scene.addItem( ccs )
     
     dialog = QDialog()
     layout = QVBoxLayout()
-    layout.addWidget(view)
+    layout.addWidget( view )
     dialog.setLayout(layout)
-    dialog.setWindowTitle("ala - coordinate system")
+    dialog.setWindowTitle( "ala - coordinate system" )
     
     
     dialog.show()
