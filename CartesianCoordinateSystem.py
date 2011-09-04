@@ -177,6 +177,9 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
 
     def addFunction( self, function ):
         function = FunctionPlotter( self, function )
+        
+        # Hmm, obviously function needs an explicit add to the scene..
+        scene.addItem( function ) 
         return function
     
 if __name__ == '__main__':
@@ -215,7 +218,6 @@ if __name__ == '__main__':
     line3 = ccs.addLineDependent( point1, point3 )
     
     function = ccs.addFunction( function )
-    function.plot()
     
     scene.addItem( ccs )
     

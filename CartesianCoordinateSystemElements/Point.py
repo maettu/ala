@@ -23,9 +23,6 @@ class Point(QGraphicsItem):
         self.ccs  = ccs
         self.size = size
         
-        self.ccs = ccs
-        self.parent = parent
-        
         # coordinates go through conversion when item is placed or painted.
         self.setPos(CST.toCcsCoord(self.ccs, self.x,self.y, self, parent))
        

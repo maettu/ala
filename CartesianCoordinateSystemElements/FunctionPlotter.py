@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from PyQt4.QtCore import (Qt, QLineF, QRectF, QPointF)
-from PyQt4.QtGui import (QGraphicsLineItem, QColor)
+from PyQt4.QtGui import (QGraphicsLineItem, QColor, QPen)
 
 import Helper.CoordinateSystemTransformation as CST
 
@@ -9,35 +9,45 @@ class FunctionPlotter( QGraphicsLineItem ):
     """Plots a function"""
     
     def __init__( self, ccs, function ):
-        super( FunctionPlotter, self ).__init__(ccs)
+        super( FunctionPlotter, self ).__init__()
         
         self.ccs = ccs
         #~ self.Rect = QRectF( -ccs.width/2, -ccs.height/2 , ccs.width, ccs.height)
-        self.Rect = QRectF( 0,0, 100,100)
+        self.Rect = QRectF( -100,-110, 100,100)
         
-        self.setPos(QPointF(ccs.xAxis, ccs.yAxis))
+        self.setPos(QPointF(self.ccs.xAxis, self.ccs.yAxis))
+        self.function = function
+        
+        self.alreadyPainted = 0
         
         
     def boundingRect(self):
         return self.Rect
         
     def paint(self, painter, option, widget=None):
-        print "juhuu"
+        #~ print "repaint function ?!"
+        #~ if self.alreadyPainted == 1:
+            #~ return
+            
         color = QPen(QColor(0, 100, 0))
         
-        self.color = QColor( 0, 100, 0 )
+        sp = CST.toCcsCoord( self.ccs, self.ccs.xMin, self.ccs.yMin)
         
-        painter.setPen(Qt.NoPen)
-        painter.setBrush(QBrush(self.color))
-        painter.drawEllipse(self.Rect)
-        
-        painter.drawRect( self.Rect )
-        
-        #~ for i in range (ccs.xMin, css.xMax+1):
-            #~ print i
+        for xRaw in range ( self.ccs.xMin, self.ccs.xMax+1 ):
+            for tiny in range ( 0 , 10 ):
+                
+                # I'm sorry, but I find this stupid for a high level language
+                x = float(tiny) / 10 + xRaw
+                                
+                ep = CST.toCcsCoord( self.ccs, x, eval( self.function ) )
+                painter.drawLine( QLineF(sp, ep ) )
+                sp = ep
+                
+        self.alreadyPainted = 1
         
     def plot( self ):
         print "weehooo"
+       
         
         
 
