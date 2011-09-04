@@ -139,7 +139,9 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
     # This Point is not really needed. It makes for an
     # linearily dependet point. Who wanted this?!
     # Interesting are points with a dependence according to a
-    # mathematical function.
+    # mathematical function. there, of course, should it be *very* easy to
+    # emulate a linearily depending point.
+    # TODO factor out
     def addPointDependent( self, parent, x,y, size,red=0,green=100,blue=0 ):
         return Point( self, parent, x,y,size,red,green,blue )
 
@@ -148,7 +150,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         point = PointXFunction( self, self, parent.x,parent.y*factor,size,red,green,blue )
         # dependent point probably has an y which is impossible. So just
         # silently set to function value.
-        point.setPosition(parent.x)
+        # point.setPosition(parent.x)
 
         # make itself a child of another point (no type checking so far)
         parent.addChildPoint(point)

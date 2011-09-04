@@ -56,7 +56,7 @@ class Line(QGraphicsLineItem):
         # need to change Rect to force repaint?!
         self.setRect = QRectF(QPointF(0,0), ep)
 
-        print self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y
+        #print self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y
        
         #self.repaint()
         #painter.drawLine(QLineF(0, 0, ep.x()-sp.x(), ep.y()-sp.y() ))
