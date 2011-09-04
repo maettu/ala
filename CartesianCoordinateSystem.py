@@ -145,16 +145,18 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
     def addPointDependent( self, parent, x,y, size,red=0,green=100,blue=0 ):
         return Point( self, parent, x,y,size,red,green,blue )
 
-    def addPointXFunction( self, parent, x, factor, size,red=200,green=0,blue=0 ):
+    def addPointXFunction( self, parent, x, function, size,red=200,green=0,blue=0 ):
         # make a point of its own; directly dependent to coordinate system
-        point = PointXFunction( self, self, x, size,red,green,blue )
+        point = PointXFunction( self, self, x, size,red,green,blue, function )
         # dependent point probably has an y which is impossible. So just
         # silently set to function value.
         # point.setPosition(parent.x)
 
-        # make itself a child of another point (no type checking so far)
+        # make itself a child of another point; or some points
+        # (no type checking so far)
         if parent:
-            parent.addChildPoint(point)
+            for p in parent:
+                p.addChildPoint(point)
         
         return point
         
@@ -194,9 +196,13 @@ if __name__ == '__main__':
     
     # two points on a function
     point4 = ccs.addPointXFunction( None,    1, 'x**2', 10 )
-    point5 = ccs.addPointXFunction( point4,  2, 'x**2', 10 )
+    point5 = ccs.addPointXFunction( [point4],  2, 'x**2', 10 )
+    #point6 = ccs.addPointDependent( point4,  2, 1     , 10 )
+    point6 = ccs.addPointXFunction( [point4,point5], 2, '1', 0 )
 
-    line1 = ccs.addLineDependent( point4,point5 )
+    line1 = ccs.addLineDependent( point4, point5 )
+    line2 = ccs.addLineDependent( point5, point6 )
+    line3 = ccs.addLineDependent( point4, point6 )
     
     scene.addItem( ccs )
     
