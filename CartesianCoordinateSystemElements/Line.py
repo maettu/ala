@@ -47,10 +47,6 @@ class Line( QGraphicsLineItem ):
                 incline = ( self.endPoint.y - self.startPoint.y ) / ( self.endPoint.x - self.startPoint.x )
                 painter.drawText( ep.x() + 10, ep.y() + 10, QString ( str(incline) ) )
         
-        if (line.dx() != 0): # prevent div by 0
-            steigung = ( self.endPoint.y - self.startPoint.y ) / ( self.endPoint.x - self.startPoint.x )
-            print "Steigung, selbst berechnet: ", steigung
-
     def updateYourself( self, xDelta, yDelta ):
         # There is no action needed, as a line gets its information
         # from startPoint and endPoint
