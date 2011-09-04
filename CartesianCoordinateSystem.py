@@ -133,8 +133,10 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             
     def addPoint(self, x,y, size, red=0,green=200,blue=0):
         point = Point(self, self,x,y,size,red,green,blue)
-        # After addPointDependet is removed, 2nd parameter becomes obsolete(?)
+        # After addPointDependent is removed, 2nd parameter becomes obsolete(?)
         return point
+        
+        
     # This Point is not really needed. It makes for an
     # linearily dependet point. Who wanted this?!
     # Interesting are points with a dependence according to a
@@ -213,6 +215,7 @@ if __name__ == '__main__':
     line3 = ccs.addLineDependent( point1, point3 )
     
     function = ccs.addFunction( function )
+    function.plot()
     
     scene.addItem( ccs )
     

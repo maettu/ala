@@ -17,22 +17,12 @@ class Line( QGraphicsLineItem ):
         
         self.Rect = QRectF( -ccs.width, -ccs.height, ccs.width*2,
                             ccs.height*2 )
-        
-        self.color = QColor( 255,0,0 )
-        
-        self.rot = 100
-        
+
     def boundingRect( self ):
         return self.Rect
 
-        
-        
     def paint( self, painter, option, widget=None ):
         painter.setPen( QColor( "orange" ) )
-
-        
-        # as soon as dependent points are *not relative* to parent points any more,
-        # this needs to be changed.
 
         sp = CST.toCcsCoord( self.ccs, self.startPoint.x, self.startPoint.y )
         ep = CST.toCcsCoord( self.ccs, self.endPoint.x, self.endPoint.y )
@@ -40,10 +30,8 @@ class Line( QGraphicsLineItem ):
         painter.drawLine( QLineF(0, 0, ep.x()-sp.x(), ep.y()-sp.y() ) )
 
     def updateYourself( self, xDelta, yDelta ):
-        # TODO: startpoint & endpoint change, then paint() should
-        # happen automagically :-)
-
         ep = CST.toCcsCoord( self.ccs, self.endPoint.x, self.endPoint.y )
+        
         # need to change Rect to force repaint?!
         self.setRect = QRectF( QPointF(0,0), ep )
 
