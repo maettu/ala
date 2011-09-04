@@ -93,11 +93,7 @@ class Point(QGraphicsItem):
                 child.updateYourself(xDelta, yDelta)
 
             # if a points moves, the whole coordinate system is updated.
-            # I will have to investigate how terrible the 
-            # performance penalty is.
-            # This is unneccessary if we update children manually.
-            # Even better. :-)
-            #self.ccs.update()
+            self.ccs.update()
         
     def mouseReleaseEvent(self, e):
         self.leftMouseButtonPressed = None

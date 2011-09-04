@@ -44,7 +44,10 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         self.tickXOffset    = tickXOffset
         self.tickYOffset    = tickYOffset
         
-        self.Rect = QRectF( -width/2, -height/2 , width, height)
+        # Thing is, ccs gets setPos later on. This
+        # moves its Rect as well. To be sure that everything
+        # gets repainted, Rect is very large. 
+        self.Rect = QRectF( -width, -height , width*2, height*2)
         
         # centre of logical coordinate system gets
         # positioned where (0,0) of the origin of
@@ -198,18 +201,18 @@ if __name__ == '__main__':
     view.setScene(scene)
     view.setRenderHint(QPainter.Antialiasing)
     
-    ccs = CartesianCoordinateSystemWidget(width, height, 10, -2,4,-1,10)
+    ccs = CartesianCoordinateSystemWidget(width, height, 10, -5,5,-1,10)
     
     # coordinates are always relative to coordinate system, as it should be
     #point1 = ccs.addPoint(3,3,10)
     #point2 = ccs.addPointDependent(point1,1,1,10)
     #point3 = ccs.addPointDependent(point2,-1,0,10,0,0,100)
     
-    function = '0.5*x**2'
+    function = 'x**2'
     
     # two points on a function
-    point1 = ccs.addPointXFunction                          ( None,    1, function, 10 )
-    point2 = ccs.addPointXFunction                          ( [point1],  2, '0.5*x**2', 10 )
+    point1 = ccs.addPointXFunction                          ( None,    1,   function, 10 )
+    point2 = ccs.addPointXFunction                          ( [point1],  2, function, 10 )
     # third point, invisible, to form triangle
     point3 = ccs.addPointWithXFromOnePointAndYFromAnother   ( point2, point1 )
 
