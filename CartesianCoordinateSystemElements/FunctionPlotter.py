@@ -12,14 +12,19 @@ class FunctionPlotter( QGraphicsLineItem ):
         super( FunctionPlotter, self ).__init__()
         
         self.ccs = ccs
-        self.Rect = QRectF( -ccs.width/2, -ccs.height/2 , ccs.width, ccs.height)
+        #~ self.Rect = QRectF( -ccs.width/2, -ccs.height/2 , ccs.width, ccs.height)
+        self.Rect = QRectF( 0,0, 100,100)
+        
+        print "init"
         
         self.setPos(QPointF(ccs.xAxis, ccs.yAxis))
+        
         
     def boundingRect(self):
         return self.Rect
         
     def paint(self, painter, option, widget=None):
+        print "juhuu"
         color = QPen(QColor(0, 100, 0))
         
         painter.drawRect( self.Rect )

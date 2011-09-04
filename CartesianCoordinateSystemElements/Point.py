@@ -117,8 +117,3 @@ class Point(QGraphicsItem):
         # when will we ever see.. ?
         print "huhu"
 
-    #def updateYourself(self):
-    #    self.setPos( CST.toCcsCoord(
-    #        self.ccs, self.x,self.y )
-    #    )
-

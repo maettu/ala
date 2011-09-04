@@ -15,9 +15,6 @@ class Line( QGraphicsLineItem ):
         self.endPoint = endPoint
         self.ccs = ccs
         
-        # before painting widget coordinates need to be calculated
-        # p = CST.toCcsCoord( ccs, self.endPoint.x, self.endPoint.y )
-        # self.Rect = QRectF(QPointF(0,0), p)
         self.Rect = QRectF( -ccs.width, -ccs.height, ccs.width*2,
                             ccs.height*2 )
         
@@ -45,7 +42,7 @@ class Line( QGraphicsLineItem ):
     def updateYourself( self, xDelta, yDelta ):
         # TODO: startpoint & endpoint change, then paint() should
         # happen automagically :-)
-        #sp = CST.toCcsCoord( self.ccs, self.startPoint.x, self.startPoint.y )
+
         ep = CST.toCcsCoord( self.ccs, self.endPoint.x, self.endPoint.y )
         # need to change Rect to force repaint?!
         self.setRect = QRectF( QPointF(0,0), ep )
