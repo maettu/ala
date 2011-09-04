@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-from PyQt4.QtCore import ( Qt, QLineF, QRectF, QPointF )
+from PyQt4.QtCore import ( Qt, QLineF, QRectF, QPointF, QString )
 from PyQt4.QtGui  import ( QGraphicsLineItem, QColor )
 
 import Helper.CoordinateSystemTransformation as CST
@@ -11,11 +11,12 @@ class Line( QGraphicsLineItem ):
     def __init__( self, startPoint, endPoint, ccs, paintToBorder = False, showIncline = False, color = 'orange' ):
         super( Line, self ).__init__( ccs )
         
-        self.startPoint = startPoint
-        self.endPoint = endPoint
-        self.ccs = ccs
-        self.paintToBorder = paintToBorder
-        self.color = color
+        self.startPoint     = startPoint
+        self.endPoint       = endPoint
+        self.ccs            = ccs
+        self.paintToBorder  = paintToBorder
+        self.showIncline    = showIncline
+        self.color          = color
         
         self.Rect = QRectF(startPoint.x, startPoint.y, endPoint.x, endPoint.y )
 
@@ -40,6 +41,11 @@ class Line( QGraphicsLineItem ):
                 painter.drawLine(ep,ep2)
                 sp2 = line.pointAt(-self.ccs.width / line.length() )
                 painter.drawLine(sp,sp2)
+        
+        if self.showIncline == True:
+            if line.length() > 2:
+                incline = ( self.endPoint.y - self.startPoint.y ) / ( self.endPoint.x - self.startPoint.x )
+                painter.drawText( ep.x() + 10, ep.y() + 10, QString ( str(incline) ) )
         
         if (line.dx() != 0): # prevent div by 0
             steigung = ( self.endPoint.y - self.startPoint.y ) / ( self.endPoint.x - self.startPoint.x )
