@@ -45,7 +45,8 @@ class Line( QGraphicsLineItem ):
         if self.showIncline == True:
             if line.length() > 2:
                 incline = ( self.endPoint.y - self.startPoint.y ) / ( self.endPoint.x - self.startPoint.x )
-                painter.drawText( ep.x() + 10, ep.y() + 10, QString ( str(incline) ) )
+                # print text limited to 2 decimal digits.
+                painter.drawText( ep.x() + 10, ep.y() + 10, QString ( '%.2f' %(incline) ) )
         
     def updateYourself( self, xDelta, yDelta ):
         # There is no action needed, as a line gets its information
