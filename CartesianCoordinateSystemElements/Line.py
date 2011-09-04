@@ -1,67 +1,53 @@
 #!/usr/bin/python
 
-from PyQt4.QtCore import (Qt, QLineF, QRectF, QPointF)
-from PyQt4.QtGui import (QGraphicsLineItem, QColor)
+from PyQt4.QtCore import ( Qt, QLineF, QRectF, QPointF )
+from PyQt4.QtGui  import ( QGraphicsLineItem, QColor )
 
 import Helper.CoordinateSystemTransformation as CST
 
-class Line(QGraphicsLineItem):
+class Line( QGraphicsLineItem ):
     """Defines a line by two points. If points are moved, line follows these movements."""
     
-    def __init__(self, startPoint, endPoint, ccs):
-        super(Line, self).__init__(startPoint)
+    def __init__( self, startPoint, endPoint, ccs ):
+        super( Line, self ).__init__( startPoint )
         
         self.startPoint = startPoint
         self.endPoint = endPoint
         self.ccs = ccs
         
         # before painting widget coordinates need to be calculated
-        #p = CST.toCcsCoord( ccs, self.endPoint.x, self.endPoint.y )
-        #self.Rect = QRectF(QPointF(0,0), p)
+        # p = CST.toCcsCoord( ccs, self.endPoint.x, self.endPoint.y )
+        # self.Rect = QRectF(QPointF(0,0), p)
         self.Rect = QRectF( -ccs.width, -ccs.height, ccs.width*2,
-                            ccs.height*2)
-
-        print ccs.width, ccs.height
+                            ccs.height*2 )
         
-        self.color = QColor(255,0,0)
+        self.color = QColor( 255,0,0 )
         
         self.rot = 100
         
-    def boundingRect(self):
+    def boundingRect( self ):
         return self.Rect
 
         
         
-    def paint(self, painter, option, widget=None):        
-        painter.setPen(QColor("orange"))
+    def paint( self, painter, option, widget=None ):
+        painter.setPen( QColor( "orange" ) )
 
         
         # as soon as dependent points are *not relative* to parent points any more,
         # this needs to be changed.
 
-        sp = CST.toCcsCoord(self.ccs, self.startPoint.x, self.startPoint.y)
-        ep = CST.toCcsCoord(self.ccs, self.endPoint.x, self.endPoint.y)
+        sp = CST.toCcsCoord( self.ccs, self.startPoint.x, self.startPoint.y )
+        ep = CST.toCcsCoord( self.ccs, self.endPoint.x, self.endPoint.y )
         
-        self.setLine(sp.x(), sp.y(), ep.x(),ep.y())
-        #painter.drawLine(0,0,100,100)
-        #self.painter = painter
-        #self.option  = option
-        painter.drawLine(QLineF(0, 0, ep.x()-sp.x(), ep.y()-sp.y() ))
+        painter.drawLine( QLineF(0, 0, ep.x()-sp.x(), ep.y()-sp.y() ) )
 
-    def updateYourself(self, xDelta, yDelta):
+    def updateYourself( self, xDelta, yDelta ):
         # TODO: startpoint & endpoint change, then paint() should
-        # happen automaically :-)
+        # happen automagically :-)
         #sp = CST.toCcsCoord( self.ccs, self.startPoint.x, self.startPoint.y )
         ep = CST.toCcsCoord( self.ccs, self.endPoint.x, self.endPoint.y )
         # need to change Rect to force repaint?!
-        self.setRect = QRectF(QPointF(0,0), ep)
-
-        #print self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y
-       
-        #self.repaint()
-        #painter.drawLine(QLineF(0, 0, ep.x()-sp.x(), ep.y()-sp.y() ))
-
-        #ccs.update()
-
+        self.setRect = QRectF( QPointF(0,0), ep )
 
 

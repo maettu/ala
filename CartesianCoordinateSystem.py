@@ -3,9 +3,6 @@
 # Cartesian Coordinate System Widget
 # ----------------------------------
 
-
-
-
 from PyQt4.QtCore import (Qt, QRectF, QPointF, QLineF, QTimer, QObject, SIGNAL, QString)
 from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView, 
     QGraphicsItem, QPen, QColor, QDialog, QVBoxLayout, QBrush, QPainter)
@@ -14,6 +11,7 @@ from CartesianCoordinateSystemElements.Point import Point
 from CartesianCoordinateSystemElements.PointXFunction import PointXFunction
 from CartesianCoordinateSystemElements.Line  import Line
 from CartesianCoordinateSystemElements.PointWithXFromOneParentAndYFromAnother import PointWithXFromOneParentAndYFromAnother
+from CartesianCoordinateSystemElements.FunctionPlotter import FunctionPlotter
 
 import Helper.CoordinateSystemTransformation as CST
 
@@ -164,7 +162,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         yParent.addChildPoint(point)
         return point
         
-    def addLineDependent(self, startPoint, endPoint):
+    def addLineDependent( self, startPoint, endPoint ):
         line = Line(
             startPoint, 
             endPoint, 
@@ -174,6 +172,10 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         startPoint.addChildPoint(line)
         endPoint.addChildPoint(line)
         return line
+
+    def addFunction( self, function ):
+        function = FunctionPlotter( self, function )
+        return function
     
 if __name__ == '__main__':
     import sys
@@ -198,15 +200,19 @@ if __name__ == '__main__':
     #point2 = ccs.addPointDependent(point1,1,1,10)
     #point3 = ccs.addPointDependent(point2,-1,0,10,0,0,100)
     
+    function = '0.5*x**2'
+    
     # two points on a function
-    point4 = ccs.addPointXFunction( None,    1, '0.5*x**2', 10 )
-    point5 = ccs.addPointXFunction( [point4],  2, '0.5*x**2', 10 )
-    #point6 = ccs.addPointXFunction( [point4,point5], 2, '1', 0 )
-    point6 = ccs.addPointWithXFromOnePointAndYFromAnother( point5, point4 )
+    point1 = ccs.addPointXFunction                          ( None,    1, function, 10 )
+    point2 = ccs.addPointXFunction                          ( [point1],  2, '0.5*x**2', 10 )
+    # third point, invisible, to form triangle
+    point3 = ccs.addPointWithXFromOnePointAndYFromAnother   ( point2, point1 )
 
-    line1 = ccs.addLineDependent( point4, point5 )
-    line2 = ccs.addLineDependent( point5, point6 )
-    line3 = ccs.addLineDependent( point4, point6 )
+    line1 = ccs.addLineDependent( point1, point2 )
+    line2 = ccs.addLineDependent( point2, point3 )
+    line3 = ccs.addLineDependent( point1, point3 )
+    
+    function = ccs.addFunction( function )
     
     scene.addItem( ccs )
     
