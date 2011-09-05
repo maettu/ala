@@ -30,6 +30,10 @@ class PointXFunction( Point ):
         p = CST.fromCcsCoord( self.ccs, x, 0, self, self.parent )
         self.x = p.x()
         self.setPosition()
+        
+    def redefine( self , function):
+        self.function = function
+        self.setPosition
 
     def setPosition( self ):
         x = self.x
@@ -42,4 +46,3 @@ class PointXFunction( Point ):
         # point moves relative to parent.
         self.x = self.x + xDelta
         self.setPosition()
-       

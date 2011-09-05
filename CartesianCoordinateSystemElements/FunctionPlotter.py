@@ -47,10 +47,9 @@ class FunctionPlotter( QGraphicsLineItem ):
                 
         self.alreadyPainted = 1
         
-    def plot( self ):
-        print "weehooo"
-       
-        
+    def redefine( self, function ):
+        self.function = function
+        self.update()
         
 
 
