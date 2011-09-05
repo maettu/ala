@@ -22,7 +22,8 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
     coordinate system into its own according to users settings."""
     
     def __init__(
-            self, widthPixel=500, 
+            self, scene, 
+            widthPixel=500, 
             heightPixel=500, 
             marginPixel = 10, 
             xMin = -10, 
@@ -47,7 +48,10 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         # Thing is, ccs gets setPos later on. This
         # moves its Rect as well. To be sure that everything
         # gets repainted, Rect is very large. 
-        self.Rect = QRectF( -width, -height , width*2, height*2)
+        self.Rect = QRectF( -self.width, -self.height , self.width*2, self.height*2)
+        
+        # needed for explicit adds of elements. How to get rid of this?
+        self.scene = scene
         
         # centre of logical coordinate system gets
         # positioned where (0,0) of the origin of
@@ -65,14 +69,14 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         elif xMin >= 0 and xMax >= 0:
             self.xAxis = 0
         else:
-            self.xAxis = width / (xMax - xMin) * -xMin + self.margin / 2
+            self.xAxis = self.width / ( xMax - xMin ) * -xMin + self.margin / 2
             
         if yMin <= 0 and yMax <= 0:
             self.yAxis = height
         elif yMin >= 0 and yMax >= 0:
             self.yAxis = 0
         else:
-            self.yAxis = height - (height / (yMax - yMin) * -yMin) - self.margin / 2
+            self.yAxis = self.height - ( self.height / (yMax - yMin) * -yMin ) - self.margin / 2
         
         self.setPos(QPointF(self.xAxis, self.yAxis))
         
@@ -123,8 +127,8 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 painter.setPen(normalLineCol)
             
             painter.drawLine(
-                CST.toCcsCoord(self, self.xMin,i), 
-                CST.toCcsCoord(self, self.xMax,i)
+                CST.toCcsCoord( self, self.xMin,i ), 
+                CST.toCcsCoord( self, self.xMax,i )
             )
             
             tickCoord = CST.toCcsCoord(self, 0,i)
@@ -185,7 +189,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         function = FunctionPlotter( self, function )
         
         # Hmm, obviously function needs an explicit add to the scene..
-        scene.addItem( function ) 
+        self.scene.addItem( function ) 
         return function
     
 if __name__ == '__main__':
@@ -204,14 +208,14 @@ if __name__ == '__main__':
     view.setScene(scene)
     view.setRenderHint(QPainter.Antialiasing)
     
-    ccs = CartesianCoordinateSystemWidget(width, height, 10, -5,5,-1,10)
+    ccs = CartesianCoordinateSystemWidget(scene, width, height, 10, -5,5,-1,10)
     
     # coordinates are always relative to coordinate system, as it should be
     #point1 = ccs.addPoint(3,3,10)
     #point2 = ccs.addPointDependent(point1,1,1,10)
     #point3 = ccs.addPointDependent(point2,-1,0,10,0,0,100)
     
-    function = 'x**2'
+    function = '2.71**x'
     
     # two points on a function
     point1 = ccs.addPointXFunction                          ( None,    1,   function, 10, 0,0,200 )

@@ -3,7 +3,7 @@
 from PyQt4.QtCore import (Qt, QLineF, QRectF, QPointF)
 from PyQt4.QtGui import (QGraphicsLineItem, QColor, QPen)
 
-import Helper.CoordinateSystemTransformation as CST
+import ala.Helper.CoordinateSystemTransformation as CST
 
 class FunctionPlotter( QGraphicsLineItem ):
     """Plots a function"""

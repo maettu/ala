@@ -3,7 +3,7 @@
 from PyQt4.QtCore import ( Qt, QLineF, QRectF, QPointF, QString )
 from PyQt4.QtGui  import ( QGraphicsLineItem, QColor )
 
-import Helper.CoordinateSystemTransformation as CST
+import ala.Helper.CoordinateSystemTransformation as CST
 
 class Line( QGraphicsLineItem ):
     """Defines a line by two points. If points are moved, line follows these movements."""

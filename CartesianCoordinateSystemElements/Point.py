@@ -3,7 +3,7 @@
 from PyQt4.QtCore import (Qt, QRectF, QPointF)
 from PyQt4.QtGui import (QGraphicsItem, QColor, QBrush)
 
-import Helper.CoordinateSystemTransformation as CST
+import ala.Helper.CoordinateSystemTransformation as CST
 
 class Point(QGraphicsItem):
     """Defines a movable point."""

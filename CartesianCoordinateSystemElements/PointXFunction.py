@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from Point import Point
-import Helper.CoordinateSystemTransformation as CST
+import ala.Helper.CoordinateSystemTransformation as CST
 
 class PointXFunction( Point ):
     """Defines a movable point with an y which is functionally
