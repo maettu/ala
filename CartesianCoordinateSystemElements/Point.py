@@ -103,10 +103,4 @@ class Point(QGraphicsItem):
 
     def set_y(self, y):
         self.y = y
-    
-    # update can't easyily be called for some mysterious reason
-    # (mysterious to me, at least)
-    def update(self):
-        # when will we ever see.. ?
-        print "huhu"
 

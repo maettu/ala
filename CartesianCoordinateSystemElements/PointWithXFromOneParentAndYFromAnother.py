@@ -20,4 +20,3 @@ class PointWithXFromOneParentAndYFromAnother( Point ):
         self.x = self.xParent.x
         self.y = self.yParent.y
 
-

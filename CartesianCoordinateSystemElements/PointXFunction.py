@@ -34,10 +34,11 @@ class PointXFunction( Point ):
     def redefine( self , function):
         self.function = function
         self.setPosition
+        self.update()
 
     def setPosition( self ):
         x = self.x
-        self.y = eval(self.function)
+        self.y = eval( self.function )
         self.setPos ( CST.toCcsCoord(
             self.ccs, self.x, self.y )
         )

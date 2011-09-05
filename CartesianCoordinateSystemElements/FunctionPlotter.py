@@ -33,17 +33,24 @@ class FunctionPlotter( QGraphicsLineItem ):
         
         # x must be set, because function will most probably contain it.
         x = self.ccs.xMin
-        sp = CST.toCcsCoord( self.ccs, x, eval( self.function ) )
+        try:
+            sp = CST.toCcsCoord( self.ccs, x, eval( self.function ) )
+        except:
+            # silence errors like "raise negative number to fractional power"
+            pass
         
         for xRaw in range ( self.ccs.xMin, self.ccs.xMax+1 ):
             for tiny in range ( 0 , 10 ):
                 
                 # I'm sorry, but I find this stupid for a high level language
                 x = float(tiny) / 10 + xRaw
-                                
-                ep = CST.toCcsCoord( self.ccs, x, eval( self.function ) )
-                painter.drawLine( QLineF(sp, ep ) )
-                sp = ep
+                
+                try:                
+                    ep = CST.toCcsCoord( self.ccs, x, eval( self.function ) )
+                    painter.drawLine( QLineF(sp, ep ) )
+                    sp = ep
+                except:
+                    pass # see try - except above
                 
         self.alreadyPainted = 1
         
