@@ -47,3 +47,6 @@ class PointXFunction( Point ):
         # point moves relative to parent.
         self.x = self.x + xDelta
         self.setPosition()
+        
+        #update all children. This way the update becomes recursive
+        self.updateChildren( xDelta, yDelta )

@@ -87,10 +87,7 @@ class Point(QGraphicsItem):
             yDelta = self.y -y
             
             #upadate functionally dependent children
-            # TODO: child keeps x, only updates according to relative
-            # movement.
-            for child in self.children:
-                child.updateYourself(xDelta, yDelta)
+            self.updateChildren( xDelta, yDelta )
 
             # if a points moves, the whole coordinate system is updated.
             self.ccs.update()
@@ -103,4 +100,8 @@ class Point(QGraphicsItem):
 
     def set_y(self, y):
         self.y = y
+        
+    def updateChildren( self, xDelta, yDelta ):
+        for child in self.children:
+            child.updateYourself(xDelta, yDelta)
 

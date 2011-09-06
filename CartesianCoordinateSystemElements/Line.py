@@ -56,7 +56,8 @@ class Line( QGraphicsLineItem ):
         # from startPoint and endPoint
         # Just adjust self.Rect to avoid case where line disappears mysteriously and after then,
         # paint() is never called again
-        self.Rect = QRectF(self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y )
+        self.Rect = QRectF( self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y )
+
 
 
 
