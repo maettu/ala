@@ -1,7 +1,7 @@
 #!/usr/bin/python
 
 from PyQt4.QtCore import ( Qt, QLineF, QRectF, QPointF, QString )
-from PyQt4.QtGui  import ( QGraphicsLineItem, QColor )
+from PyQt4.QtGui  import ( QGraphicsLineItem, QColor, QBrush )
 
 import ala.Helper.CoordinateSystemTransformation as CST
 
@@ -49,6 +49,9 @@ class Line( QGraphicsLineItem ):
             if self.showIncline == True:
                 incline = ( self.endPoint.y - self.startPoint.y ) / ( self.endPoint.x - self.startPoint.x )
                 # print text limited to 2 decimal digits.
+                painter.setBackground ( QBrush ( QColor( 'lightGrey' ) ) )
+                painter.setBackgroundMode (Qt.BGMode(1))
+                painter.setPen( QColor( 'black' ) )
                 painter.drawText( self.ep.x() + 10, self.ep.y() + 10, QString ( '%.2f' %(incline) ) )
         
     def updateYourself( self, xDelta, yDelta ):
