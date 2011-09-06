@@ -8,7 +8,7 @@ import ala.Helper.CoordinateSystemTransformation as CST
 class Line( QGraphicsLineItem ):
     """Defines a line by two points. If points are moved, line follows these movements."""
     
-    def __init__( self, startPoint, endPoint, ccs, paintToBorder = False, showIncline = False, color = 'orange' ):
+    def __init__( self, startPoint, endPoint, ccs, paintToBorder = False, showIncline = False, color = 'orange', minLength = 0 ):
         super( Line, self ).__init__( ccs )
         
         self.startPoint     = startPoint
@@ -18,7 +18,7 @@ class Line( QGraphicsLineItem ):
         self.showIncline    = showIncline
         self.color          = color
         
-        self.minLength      = 2 # pixel
+        self.minLength      =  minLength # pixel
         
         self.Rect = QRectF(self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y )
 

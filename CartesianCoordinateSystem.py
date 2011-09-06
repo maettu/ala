@@ -171,14 +171,15 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         yParent.addChildPoint(point)
         return point
         
-    def addLineDependent( self, startPoint, endPoint, paintToBorder = False, showIncline = False, color = 'orange'):
+    def addLineDependent( self, startPoint, endPoint, paintToBorder = False, showIncline = False, color = 'orange', minLength = 0):
         line = Line(
             startPoint, 
             endPoint, 
             self,
             paintToBorder,
             showIncline,
-            color
+            color,
+            minLength
         )
         # TODO This needs a rename..
         startPoint.addChildPoint(line)
