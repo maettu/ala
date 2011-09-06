@@ -18,7 +18,9 @@ class Line( QGraphicsLineItem ):
         self.showIncline    = showIncline
         self.color          = color
         
-        self.Rect = QRectF(startPoint.x, startPoint.y, endPoint.x, endPoint.y )
+        self.minLength      = 2 # pixel
+        
+        self.Rect = QRectF(self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y )
 
     def boundingRect( self ):
         return self.Rect
@@ -26,32 +28,35 @@ class Line( QGraphicsLineItem ):
     def paint( self, painter, option, widget=None ):
         painter.setPen( QColor( self.color ) )
 
-        sp = CST.toCcsCoord( self.ccs, self.startPoint.x, self.startPoint.y )
-        ep = CST.toCcsCoord( self.ccs, self.endPoint.x, self.endPoint.y )
+        self.sp = CST.toCcsCoord( self.ccs, self.startPoint.x, self.startPoint.y )
+        self.ep = CST.toCcsCoord( self.ccs, self.endPoint.x, self.endPoint.y )
         
-        self.Rect = QRectF( sp, ep )
+        self.Rect = QRectF( self.sp, self.ep )
+        self.line = QLineF( self.sp, self.ep )
         
-        line = QLineF( sp, ep )
-        painter.drawLine( line )
+        if self.line.length() > self.minLength:
+            
+            painter.drawLine( self.line )
         
-        if self.paintToBorder == True:
-            if line.length() > 2:
+            if self.paintToBorder == True:
+
                 # paint line to approximately the edge of the ccs.
-                ep2 = line.pointAt( self.ccs.width / line.length() )
-                painter.drawLine(ep,ep2)
-                sp2 = line.pointAt(-self.ccs.width / line.length() )
-                painter.drawLine(sp,sp2)
+                ep2 = self.line.pointAt( self.ccs.width / self.line.length() )
+                painter.drawLine(self.ep,ep2)
+                sp2 = self.line.pointAt(-self.ccs.width / self.line.length() )
+                painter.drawLine(self.sp,sp2)
         
-        if self.showIncline == True:
-            if line.length() > 2:
+            if self.showIncline == True:
                 incline = ( self.endPoint.y - self.startPoint.y ) / ( self.endPoint.x - self.startPoint.x )
                 # print text limited to 2 decimal digits.
-                painter.drawText( ep.x() + 10, ep.y() + 10, QString ( '%.2f' %(incline) ) )
+                painter.drawText( self.ep.x() + 10, self.ep.y() + 10, QString ( '%.2f' %(incline) ) )
         
     def updateYourself( self, xDelta, yDelta ):
         # There is no action needed, as a line gets its information
         # from startPoint and endPoint
-        pass
+        # Just adjust self.Rect to avoid case where line disappears mysteriously and after then,
+        # paint() is never called again
+        self.Rect = QRectF(self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y )
 
 
 
