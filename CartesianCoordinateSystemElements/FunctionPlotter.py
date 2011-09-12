@@ -12,18 +12,20 @@ class FunctionPlotter( QGraphicsItem ):
         super( FunctionPlotter, self ).__init__(ccs)
         
         self.ccs = ccs
-        self.Rect = QRectF( -ccs.width/2, -ccs.height/2 , ccs.width, ccs.height)
         
-        self.setPos(QPointF(self.ccs.xAxis, self.ccs.yAxis))
         self.function = function
         
-        self.alreadyPainted = 0
-        
-        
+        self.Rect = QRectF( -self.ccs.width/2, -self.ccs.height/2 , self.ccs.width, self.ccs.height)
+        self.setPos(QPointF(self.ccs.xAxis, self.ccs.yAxis))
+
     def boundingRect(self):
         return self.Rect
         
     def paint(self, painter, option, widget=None):
+        
+        self.Rect = QRectF( -self.ccs.width/2, -self.ccs.height/2 , self.ccs.width, self.ccs.height)
+        
+        self.setPos(QPointF(self.ccs.xAxis, self.ccs.yAxis))
             
         color = QPen(QColor(0, 100, 0))
         
@@ -55,8 +57,6 @@ class FunctionPlotter( QGraphicsItem ):
                     pass
                 
                 sp = ep
-                
-        self.alreadyPainted = 1
         
     def redefine( self, function ):
         self.function = function
