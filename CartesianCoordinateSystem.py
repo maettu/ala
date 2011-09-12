@@ -138,11 +138,31 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 QString.number(i)
             )
             
+    # drag coordinate system around
+    def mousePressEvent(self, e):
+        if e.button() == Qt.LeftButton:
+            # save where in item the mouse was clicked
+            self.xOnWidget = e.pos().x()
+            self.yOnWidget = e.pos().y()
+            self.leftMouseButtonPressed = 1
+        
+    def mouseMoveEvent(self, e):
+        if self.leftMouseButtonPressed:
+            x_move = e.pos().x() - self.xOnWidget
+            y_move = e.pos().y() - self.yOnWidget
+            
+            self.xAxis = self.x() + x_move
+            self.yAxis = self.y() + y_move
+           
+            self.setPos(QPointF(self.xAxis, self.yAxis))
+            
+    def mouseReleaseEvent(self, e):
+        self.leftMouseButtonPressed = None
+            
     def addPoint(self, x,y, size, red=0,green=200,blue=0):
         point = Point(self, self,x,y,size,red,green,blue)
         # After addPointDependent is removed, 2nd parameter becomes obsolete(?)
         return point
-        
         
     # This Point is not really needed. It makes for an
     # linearily dependet point. Who wanted this?!

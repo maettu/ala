@@ -1,19 +1,18 @@
 #!/usr/bin/python
 
 from PyQt4.QtCore import (Qt, QLineF, QRectF, QPointF)
-from PyQt4.QtGui import (QGraphicsLineItem, QColor, QPen)
+from PyQt4.QtGui import (QGraphicsItem, QColor, QPen)
 
 import ala.Helper.CoordinateSystemTransformation as CST
 
-class FunctionPlotter( QGraphicsLineItem ):
+class FunctionPlotter( QGraphicsItem ):
     """Plots a function"""
     
     def __init__( self, ccs, function ):
-        super( FunctionPlotter, self ).__init__()
+        super( FunctionPlotter, self ).__init__(ccs)
         
         self.ccs = ccs
-        #~ self.Rect = QRectF( -ccs.width/2, -ccs.height/2 , ccs.width, ccs.height)
-        self.Rect = QRectF( -100,-110, 100,100)
+        self.Rect = QRectF( -ccs.width/2, -ccs.height/2 , ccs.width, ccs.height)
         
         self.setPos(QPointF(self.ccs.xAxis, self.ccs.yAxis))
         self.function = function
@@ -25,9 +24,6 @@ class FunctionPlotter( QGraphicsLineItem ):
         return self.Rect
         
     def paint(self, painter, option, widget=None):
-        #~ print "repaint function ?!"
-        #~ if self.alreadyPainted == 1:
-            #~ return
             
         color = QPen(QColor(0, 100, 0))
         
@@ -39,23 +35,32 @@ class FunctionPlotter( QGraphicsLineItem ):
             # silence errors like "raise negative number to fractional power"
             pass
         
+        # ep needs to be set to prevent from
+        # "assigned from before instantiated below"
+        ep = None
+        
         for xRaw in range ( self.ccs.xMin, self.ccs.xMax+1 ):
             for tiny in range ( 0 , 10 ):
                 
-                # I'm sorry, but I find this stupid for a high level language
+                # don't forget to cast into float!
                 x = float(tiny) / 10 + xRaw
                 
+                # try to set ep, which might fail due tu "raise to fractional power asf.
                 try:                
                     ep = CST.toCcsCoord( self.ccs, x, eval( self.function ) )
-                    painter.drawLine( QLineF(sp, ep ) )
-                    sp = ep
+                    if sp.y() != ep.y():
+                        painter.drawLine( QLineF(sp, ep ) )
+                    
                 except:
-                    pass # see try - except above
+                    pass
+                
+                sp = ep
                 
         self.alreadyPainted = 1
         
     def redefine( self, function ):
         self.function = function
+        self.setPos(QPointF(self.ccs.xAxis, self.ccs.yAxis))
         self.update()
         
 

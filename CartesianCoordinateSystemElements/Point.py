@@ -78,7 +78,6 @@ class Point(QGraphicsItem):
             self.leftMouseButtonPressed = 1
             
     def mouseMoveEvent(self, e):
-        
         if self.leftMouseButtonPressed:
             x = self.x
             y = self.y
