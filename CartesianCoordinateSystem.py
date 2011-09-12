@@ -101,15 +101,15 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         ordinateColor = QPen(QColor(255, 0, 0))
         normalLineCol = QPen(QColor(0, 0, 255))
         
-        for i in range (self.xMin, self.xMax+1):
+        for i in range (self.xMin-1, self.xMax+2):
             if i == 0:
                 painter.setPen(ordinateColor)
             else:
                 painter.setPen(normalLineCol)
                 
             painter.drawLine(
-                CST.toCcsCoord(self, i,self.yMin), 
-                CST.toCcsCoord(self, i,self.yMax)
+                CST.toCcsCoord(self, i,self.yMin-1), 
+                CST.toCcsCoord(self, i,self.yMax+1)
             )
             
             tickCoord = CST.toCcsCoord(self, i, 0)
@@ -119,7 +119,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 QString.number(i)
             )
 
-        for i in range (self.yMin, self.yMax+1):
+        for i in range (self.yMin-1, self.yMax+2):
             
             if i == 0:
                 painter.setPen(ordinateColor)
@@ -127,8 +127,8 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 painter.setPen(normalLineCol)
             
             painter.drawLine(
-                CST.toCcsCoord( self, self.xMin,i ), 
-                CST.toCcsCoord( self, self.xMax,i )
+                CST.toCcsCoord( self, self.xMin-1,i ), 
+                CST.toCcsCoord( self, self.xMax+1,i )
             )
             
             tickCoord = CST.toCcsCoord(self, 0,i)
@@ -155,6 +155,8 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             self.yAxis = self.y() + y_move
            
             self.setPos(QPointF(self.xAxis, self.yAxis))
+            
+            # TODO: check if coordinate system still covers whole window and adjust if appropriate
             
     def mouseReleaseEvent(self, e):
         self.leftMouseButtonPressed = None
