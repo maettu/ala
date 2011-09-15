@@ -153,16 +153,14 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             self.yOnWidget = e.pos().y()
             self.leftMouseButtonPressed = 1
             
-            # scale - to be refined..
-            #~ self.scale         ( 1.4, 1.4 )
-            #~ self.function.scale( 1.4, 1.4 )
+            #~ self.scaleMe( 1.4 )
         
-        if e.button() == Qt.RightButton:
-            # scale - to be refined..
-            #~ self.scale         ( 0.7, 0.7 )
-            #~ # mork. FunctionPlotter fails to be a client of coordinate systems
-            #~ self.function.scale( 0.7, 0.7 )
-            pass
+        #~ if e.button() == Qt.RightButton:
+            #~ self.scaleMe( 1.4 )
+            
+    def scaleMe(self, factor):
+            self.scale         ( factor, factor )
+            self.function.scale( factor, factor )
         
     def mouseMoveEvent(self, e):
         if self.leftMouseButtonPressed:
