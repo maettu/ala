@@ -50,7 +50,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         # gets repainted, Rect is very large. 
         self.Rect = QRectF( -self.width, -self.height , self.width*2, self.height*2)
         
-        # needed for explicit adds of elements. How to get rid of this?
+        # needed for explicit adds of elements like FunctionPlotter. How to get rid of this?
         self.scene = scene
         
         # centre of logical coordinate system gets
@@ -145,6 +145,16 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             self.xOnWidget = e.pos().x()
             self.yOnWidget = e.pos().y()
             self.leftMouseButtonPressed = 1
+            
+            # scale - to be refined..
+            self.scale         ( 1.4, 1.4 )
+            self.function.scale( 1.4, 1.4 )
+        
+        if e.button() == Qt.RightButton:
+            # scale - to be refined..
+            self.scale         ( 0.7, 0.7 )
+            # mork. FunctionPlotter fails to be a client of coordinate systems
+            self.function.scale( 0.7, 0.7 )
         
     def mouseMoveEvent(self, e):
         if self.leftMouseButtonPressed:
@@ -209,10 +219,10 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         return line
 
     def addFunction( self, function ):
-        function = FunctionPlotter( self, function )
+        self.function = FunctionPlotter( self, function )
         
         # Hmm, obviously function needs an explicit add to the scene..
-        self.scene.addItem( function ) 
+        self.scene.addItem( self.function ) 
         return function
     
 if __name__ == '__main__':
