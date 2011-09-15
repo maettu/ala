@@ -260,7 +260,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         
         # Hmm, obviously function needs an explicit add to the scene..
         self.scene.addItem( self.function ) 
-        return function
+        return self.function
     
 if __name__ == '__main__':
     import sys

@@ -59,6 +59,13 @@ class MainWindow( QDialog ):
         layoutOben.addWidget        ( self.scaleInButton )
         layoutOben.addWidget        ( self.scaleOutButton )
         
+        # Buttons are auto activated by default. That means, that when <Enter>
+        # is pressed anywhere, they fire clicked(), which is not what we need here.
+        # Otherwise upon changin the formula, the coordinate system is simultaneously
+        # scaled in or out.
+        self.scaleInButton.setAutoDefault(False)
+        self.scaleOutButton.setAutoDefault(False)
+        
         layout.addLayout            ( layoutOben )
         
         layout.addWidget            ( view )
@@ -71,20 +78,23 @@ class MainWindow( QDialog ):
         layoutUnten.addWidget       ( self.displayMessage                               )
         
         self.setLayout              ( layout                                            )
-        self.editFormula.setFocus   (                                                   )
+        
         
         self.connect                (self.editFormula, SIGNAL( "returnPressed()" ),
                                                                 self.updateUi           )
         self.connect                (self.scaleInButton, SIGNAL( "clicked()" ),
                                                                 self.scaleIn            )
         self.connect                (self.scaleOutButton, SIGNAL( "clicked()" ),
-                                                                self.scaleOut            )
+                                                                self.scaleOut           )
+                                                                
+        self.editFormula.setFocus   (                                                   )
 
         self.setWindowTitle         ( "Steigungen von Funktionen annaehernd bestimmen"  )
         
     def scaleIn( self ):
         # it can scale in indefinitely..
         self.ccs.scaleMe( 1.4 )
+        print 'juhuu'
         self.scaleLevel += 1
         
     def scaleOut( self ):
@@ -95,6 +105,7 @@ class MainWindow( QDialog ):
             self.scaleLevel -= 1
 
     def updateUi( self ):
+        print "updte"
         try:
             # predefine x, because it is needed in eval
             x = 0;
