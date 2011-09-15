@@ -35,6 +35,8 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         ):
         super(CartesianCoordinateSystemWidget, self).__init__()
         
+        # TODO: swap xMin, xMax and yMin, yMax if min>max
+        
         self.width          = widthPixel - marginPixel * 2
         self.height         = heightPixel - marginPixel * 2
         self.margin         = marginPixel
@@ -44,11 +46,6 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         self.yMax           = yMax
         self.tickXOffset    = tickXOffset
         self.tickYOffset    = tickYOffset
-        
-        # Thing is, ccs gets setPos later on. This
-        # moves its Rect as well. To be sure that everything
-        # gets repainted, Rect is very large. 
-        self.Rect = QRectF( -self.width, -self.height , self.width*2, self.height*2)
         
         # needed for explicit adds of elements like FunctionPlotter. How to get rid of this?
         self.scene = scene
@@ -64,21 +61,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         
         # todo: catch when min > max or min == max
         
-        if xMin <= 0 and xMax <= 0:
-            self.xAxis = width
-        elif xMin >= 0 and xMax >= 0:
-            self.xAxis = 0
-        else:
-            self.xAxis = self.width / ( xMax - xMin ) * -xMin + self.margin / 2
-            
-        if yMin <= 0 and yMax <= 0:
-            self.yAxis = height
-        elif yMin >= 0 and yMax >= 0:
-            self.yAxis = 0
-        else:
-            self.yAxis = self.height - ( self.height / (yMax - yMin) * -yMin ) - self.margin / 2
-        
-        self.setPos(QPointF(self.xAxis, self.yAxis))
+        self.initialize();
         
         # some fun :-)
         # rotate the coordinate system
@@ -96,20 +79,44 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
     # implementation mandatory
     def boundingRect(self):
         return self.Rect
+        
+    def initialize(self):
+        if self.xMin <= 0 and self.xMax <= 0:
+            self.xAxis = self.width
+        elif self.xMin >= 0 and self.xMax >= 0:
+            self.xAxis = 0
+        else:
+            self.xAxis = self.width / ( self.xMax - self.xMin ) * -self.xMin + self.margin / 2
+            
+        if self.yMin <= 0 and self.yMax <= 0:
+            self.yAxis = self.height
+        elif self.yMin >= 0 and self.yMax >= 0:
+            self.yAxis = 0
+        else:
+            self.yAxis = self.height - ( self.height / (self.yMax - self.yMin) * -self.yMin ) - self.margin / 2
+        
+        # make Rect a safely larger than window.
+        self.Rect = QRectF( 
+            self.xMin - self.xAxis - 100, 
+            self.yMin - self.yAxis - 100, 
+            self.width             + 200, 
+            self.height            + 200
+        )
+        self.setPos(QPointF(self.xAxis, self.yAxis))
 
     def paint(self, painter, option, widget=None):
         ordinateColor = QPen(QColor(255, 0, 0))
         normalLineCol = QPen(QColor(0, 0, 255))
         
-        for i in range (self.xMin-1, self.xMax+2):
+        for i in range (self.xMin, self.xMax+1):
             if i == 0:
                 painter.setPen(ordinateColor)
             else:
                 painter.setPen(normalLineCol)
                 
             painter.drawLine(
-                CST.toCcsCoord(self, i,self.yMin-1), 
-                CST.toCcsCoord(self, i,self.yMax+1)
+                CST.toCcsCoord(self, i,self.yMin), 
+                CST.toCcsCoord(self, i,self.yMax)
             )
             
             tickCoord = CST.toCcsCoord(self, i, 0)
@@ -119,7 +126,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 QString.number(i)
             )
 
-        for i in range (self.yMin-1, self.yMax+2):
+        for i in range (self.yMin, self.yMax+1):
             
             if i == 0:
                 painter.setPen(ordinateColor)
@@ -127,8 +134,8 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 painter.setPen(normalLineCol)
             
             painter.drawLine(
-                CST.toCcsCoord( self, self.xMin-1,i ), 
-                CST.toCcsCoord( self, self.xMax+1,i )
+                CST.toCcsCoord( self, self.xMin,i ), 
+                CST.toCcsCoord( self, self.xMax,i )
             )
             
             tickCoord = CST.toCcsCoord(self, 0,i)
@@ -147,14 +154,15 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             self.leftMouseButtonPressed = 1
             
             # scale - to be refined..
-            self.scale         ( 1.4, 1.4 )
-            self.function.scale( 1.4, 1.4 )
+            #~ self.scale         ( 1.4, 1.4 )
+            #~ self.function.scale( 1.4, 1.4 )
         
         if e.button() == Qt.RightButton:
             # scale - to be refined..
-            self.scale         ( 0.7, 0.7 )
-            # mork. FunctionPlotter fails to be a client of coordinate systems
-            self.function.scale( 0.7, 0.7 )
+            #~ self.scale         ( 0.7, 0.7 )
+            #~ # mork. FunctionPlotter fails to be a client of coordinate systems
+            #~ self.function.scale( 0.7, 0.7 )
+            pass
         
     def mouseMoveEvent(self, e):
         if self.leftMouseButtonPressed:
@@ -164,7 +172,38 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             self.xAxis = self.x() + x_move
             self.yAxis = self.y() + y_move
            
-            self.setPos(QPointF(self.xAxis, self.yAxis))
+            self.setPos( QPointF( self.xAxis, self.yAxis ) )
+            
+            # xMin is left border (scene-coord = 0) an yMax is top border (scene-coord = 0)
+            min = self.mapToScene( CST.toCcsCoord( self, self.xMin, self.yMax ) )
+            max = self.mapToScene( CST.toCcsCoord( self, self.xMax, self.yMin ) )
+            if min.x() < 0:
+                self.xMin += 1
+                self.xMax += 1
+
+            if max.x() > self.width:
+                self.xMin -= 1
+                self.xMax -= 1
+                
+            if min.y() < 0:
+                self.yMin -= 1
+                self.yMax -= 1
+                #~ print "bumm"
+            
+            if max.y() > self.height:
+                self.yMin += 1
+                self.yMax += 1
+                
+            # reset Rect to allow for infinite moves
+            self.Rect = QRectF( 
+                    self.xMin - self.xAxis - 100, 
+                    self.yMin - self.yAxis - 100, 
+                    self.width             + 200, 
+                    self.height            + 200
+            )
+                
+            #~ print min.y(), max.y()
+                
             
             # TODO: check if coordinate system still covers whole window and adjust if appropriate
             
