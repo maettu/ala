@@ -94,7 +94,6 @@ class MainWindow( QDialog ):
     def scaleIn( self ):
         # it can scale in indefinitely..
         self.ccs.scaleMe( 1.4 )
-        print 'juhuu'
         self.scaleLevel += 1
         
     def scaleOut( self ):
@@ -105,7 +104,6 @@ class MainWindow( QDialog ):
             self.scaleLevel -= 1
 
     def updateUi( self ):
-        print "updte"
         try:
             # predefine x, because it is needed in eval
             x = 0;
