@@ -210,7 +210,7 @@ class MainWindow( QDialog ):
                                                                 self.updateUi           )
                                                                 
         self.connect                (self.startX, SIGNAL( "valueChanged(double)" ),
-                                                                self.updateUi           )
+                                                                self.setStartPoint      )
                                                                 
         self.setWindowTitle         ( "Nullstellen von Funktionen numerisch bestimmen"  )
         
@@ -301,9 +301,23 @@ class MainWindow( QDialog ):
         time.sleep( self.sleepTime )
         
     def reset( self ):
-        pass
+        # reset "animation"
+        self.nextLabel.setText ( "Punkt auf Funktion bestimmen" )
+        self.nextStep = 0
+        try:
+            self.lineToNextXZero.setVisible( False )
+        except:
+            pass
+        self.pointOnFunction.setVisible( False )
+        self.ccs.update()
+
+        #~ pass
         # TODO enable app to reset itself so that
         # function an startpoint can be changed
+        
+    def setStartPoint( self ):
+        self.startPoint.set_x( self.startX.value() )
+        self.reset()
 
     def updateUi( self ):
         
@@ -321,18 +335,12 @@ class MainWindow( QDialog ):
         print self.function
         self.functionPlot.redefine  ( self.function )
         
-        self.startPoint.set_x( self.startX.value() )
-        #~ self.startPoint.setPosition()
+        #~ self.startPoint.set_x( self.startX.value() )
         
         self.dn()
         #~ self.functionPlot.redefine  ( self.derivation )
         
-        # reset "animation"
-        self.nextLabel.setText ( "Punkt auf Funktion bestimmen" )
-        self.nextStep = 0
-        self.lineToNextXZero.setVisible( False )
-        self.pointOnFunction.setVisible( False )
-
+        self.reset()
         
         self.ccs.update()
 
