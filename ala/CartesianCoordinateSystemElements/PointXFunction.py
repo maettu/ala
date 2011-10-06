@@ -37,6 +37,8 @@ class PointXFunction( Point ):
         self.update()
 
     def setPosition( self ):
+        # x needs to be set because it is eval'ed in 
+        # the function string
         x = self.x
         self.y = eval( self.function )
         self.setPos ( CST.toCcsCoord(
