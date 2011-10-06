@@ -35,6 +35,8 @@ class Point(QGraphicsItem):
         # point is draggable by default. If you need a non-draggable
         # point, unset by callin set_draggable( False )
         self.draggable = True
+        
+        self.visible        = True
 
     def addChildPoint(self, child):
         self.children.append(child)
@@ -67,9 +69,10 @@ class Point(QGraphicsItem):
         self.y = p.y()
         
     def paint(self, painter, option, widget=None):
-        painter.setPen(Qt.NoPen)
-        painter.setBrush(QBrush(self.color))
-        painter.drawEllipse(self.Rect)
+        if self.visible == True:
+            painter.setPen(Qt.NoPen)
+            painter.setBrush(QBrush(self.color))
+            painter.drawEllipse(self.Rect)
         
     def mousePressEvent(self, e):
         # point moves on left click
@@ -100,8 +103,10 @@ class Point(QGraphicsItem):
         self.draggable = value
 
     def set_x(self, x):
+        xDelta = x - self.x
         self.x = x
         self.setPosition()
+        #~ self.updateChildren( xDelta, 0 )
 
     def set_y(self, y):
         self.y = y
@@ -111,6 +116,9 @@ class Point(QGraphicsItem):
         self.setPos ( CST.toCcsCoord(
             self.ccs, self.x, self.y )
         )
+        
+    def setVisible( self, value ):
+        self.visible = value
         
     def updateChildren( self, xDelta, yDelta ):
         for child in self.children:
