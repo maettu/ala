@@ -100,6 +100,13 @@ class Point(QGraphicsItem):
     def set_y(self, y):
         self.y = y
         
+    def setPosition( self ):
+        #~ x = self.x
+        #~ y = self.y
+        self.setPos ( CST.toCcsCoord(
+            self.ccs, self.x, self.y )
+        )
+        
     def updateChildren( self, xDelta, yDelta ):
         for child in self.children:
             child.updateYourself(xDelta, yDelta)
