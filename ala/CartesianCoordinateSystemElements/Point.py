@@ -31,6 +31,10 @@ class Point(QGraphicsItem):
         # All children of this point. These get updated when point
         # moves
         self.children = []
+        
+        # point is draggable by default. If you need a non-draggable
+        # point, unset by callin set_draggable( False )
+        self.draggable = True
 
     def addChildPoint(self, child):
         self.children.append(child)
@@ -61,8 +65,6 @@ class Point(QGraphicsItem):
         p = CST.fromCcsCoord( self.ccs, x,y, self, self.parent )
         self.x = p.x()
         self.y = p.y()
-
-
         
     def paint(self, painter, option, widget=None):
         painter.setPen(Qt.NoPen)
@@ -78,7 +80,7 @@ class Point(QGraphicsItem):
             self.leftMouseButtonPressed = 1
             
     def mouseMoveEvent(self, e):
-        if self.leftMouseButtonPressed:
+        if self.leftMouseButtonPressed and self.draggable:
             x = self.x
             y = self.y
             self.calculatePosition(e)
@@ -93,6 +95,9 @@ class Point(QGraphicsItem):
         
     def mouseReleaseEvent(self, e):
         self.leftMouseButtonPressed = None
+        
+    def set_draggable( self, value ):
+        self.draggable = value
 
     def set_x(self, x):
         self.x = x
