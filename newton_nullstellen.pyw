@@ -30,6 +30,7 @@ from PyQt4.QtGui import (   QApplication,
                         )
 
 import sys
+import time
 
 from ala.CartesianCoordinateSystem import CartesianCoordinateSystemWidget
 
@@ -42,12 +43,18 @@ class MainWindow( QDialog ):
         width  = 520
         height = 520
         
-        # May be ax³ + bx² + cx + d and nothing else for this app.
-        # This is a somewhat narrow limitation but it is enough
-        # for educational purposes.
-        function ="1.0*x**3 + 4.0*x**2 + 2.0*x - 2.0"
-
-
+        # user presses "go!" button, then ona step
+        # after the other is executed:
+        # - draw point on function
+        # - calculate next point on x-axis
+        # - draw line
+        # - ...
+        self.nextStep = 0;
+        
+        # The animation is quite slow (on purpose)
+        # user has enough time to watch what is going on
+        self.sleepTime = 2
+        
         scene = QGraphicsScene()
         scene.setSceneRect(0, 0, width, height)
 
@@ -62,27 +69,33 @@ class MainWindow( QDialog ):
         # set minimum to a (large) negative number. Default is 0..
         self.a.setMinimum   ( -1000 )
         self.a.setValue( 1 )
+        self.a.setSingleStep( 0.1 )
         
         self.b = QDoubleSpinBox()
         self.b.setMinimum   ( -1000 )
         self.b.setValue( 4 )
+        self.b.setSingleStep( 0.1 )
         
         self.c = QDoubleSpinBox()
         self.c.setMinimum   ( -1000 )
         self.c.setValue( 2 )
+        self.c.setSingleStep( 0.1 )
         
         self.d = QDoubleSpinBox()
         self.d.setMinimum   ( -1000 )
         self.d.setValue     ( -2 )
+        self.d.setSingleStep( 0.1 )
         
         self.x__3 = QLabel( "x<sup>3</sup> +" )
         self.x__2 = QLabel( "x<sup>2</sup> +" )
         self.x__1 = QLabel( "x +" )
         
+        # May be ax³ + bx² + cx + d and nothing else for this app.
+        # This is a somewhat narrow limitation but it is enough
+        # for educational purposes.
+        self.function ="1.0*x**3 + 4.0*x**2 + 2.0*x - 2.0"
         
-        self.displayMessage = QLabel( "ok" )
-
-        self.function = function
+        self.dn()
         
         # to make sure that one can not scale out more than original scale
         self.scaleLevel = 0
@@ -90,26 +103,16 @@ class MainWindow( QDialog ):
         self.scaleInButton  = QPushButton( "scale in" )
         self.scaleOutButton = QPushButton( "scale out" )
 
-        # two points on a function
-        #~ self.point1 = self.ccs.addPointXFunction                          ( None,           0, self.function, 10, 0,0,200   )
-        #~ self.point2 = self.ccs.addPointXFunction                          ( [self.point1],  1, self.function, 10            )
-        #~ # third point, invisible, to form triangle
-        #~ self.point3 = self.ccs.addPointWithXFromOnePointAndYFromAnother   ( self.point2, self.point1                        )
-
-        #~ self.line1 = self.ccs.addLineDependent                            ( self.point1, self.point2 , True, True, 'red', 2 )
-        #~ self.line2 = self.ccs.addLineDependent                            ( self.point2, self.point3                        )
-        #~ self.line3 = self.ccs.addLineDependent                            ( self.point1, self.point3                        )
-
         self.functionPlot = self.ccs.addFunction                          ( self.function                                   )
 
-        scene.addItem               ( self.ccs                                          )
+        scene.addItem                   ( self.ccs )
 
-        layout = QVBoxLayout        (                                                   )
+        layout = QVBoxLayout            ()
         
         
-        layoutOben = QHBoxLayout    ()
-        layoutOben.addWidget        ( self.scaleInButton )
-        layoutOben.addWidget        ( self.scaleOutButton )
+        layoutOben = QHBoxLayout        ()
+        layoutOben.addWidget            ( self.scaleInButton )
+        layoutOben.addWidget            ( self.scaleOutButton )
         
         # Buttons are auto activated by default. That means, that when <Enter>
         # is pressed anywhere, they fire clicked(), which is not what we need here.
@@ -118,27 +121,64 @@ class MainWindow( QDialog ):
         self.scaleInButton.setAutoDefault(False)
         self.scaleOutButton.setAutoDefault(False)
         
-        layout.addLayout            ( layoutOben )
+        layout.addLayout                ( layoutOben )
         
-        layout.addWidget            ( view )
+        layout.addWidget                ( view )
         
-        layoutUnten = QHBoxLayout   ()
+        layout.addWidget                ( QLabel( "Funktion: " ) )
         
-        layout.addLayout            ( layoutUnten )
+        layoutFunction = QHBoxLayout    ()
+        layout.addLayout                ( layoutFunction )
         
 
-        layoutUnten.addWidget       ( self.a )
-        layoutUnten.addWidget       ( self.x__3 )
-        layoutUnten.addWidget       ( self.b )
-        layoutUnten.addWidget       ( self.x__2 )
-        layoutUnten.addWidget       ( self.c )
-        layoutUnten.addWidget       ( self.x__1 )
-        layoutUnten.addWidget       ( self.d )
+        layoutFunction.addWidget        ( self.a )
+        layoutFunction.addWidget        ( self.x__3 )
+        layoutFunction.addWidget        ( self.b )
+        layoutFunction.addWidget        ( self.x__2 )
+        layoutFunction.addWidget        ( self.c )
+        layoutFunction.addWidget        ( self.x__1 )
+        layoutFunction.addWidget        ( self.d )
         
-        #~ layoutUnten.addWidget       ( self.spacer )
-        layoutUnten.addStretch()
+        layoutFunction.addStretch()
         
-        layoutUnten.addWidget       ( self.displayMessage                               )
+        
+        layoutStart = QHBoxLayout ()
+        layout.addLayout          ( layoutStart )
+        layoutStart.addWidget     ( QLabel( "<html>Startpunkt f&uuml;r Ann&auml;herung:</html>" ) )
+        
+        # starting point for newton iteration
+        # can be changed until "go!" is pressed
+        self.startX = QDoubleSpinBox()
+        self.startX.setMinimum   ( -1000 )
+        self.startX.setValue( 0 )
+        self.startX.setSingleStep( 0.1 )
+        self.startX.setDecimals( 10 )
+        
+        layoutStart.addWidget                ( self.startX )
+        layoutStart.addStretch()
+        self.startButton  = QPushButton( "go!" )
+        layoutStart.addWidget( self.startButton )
+        
+        self.startPoint = self.ccs.addPoint(self.startX.value(),0, 10)
+        self.startPoint.set_draggable( False )
+        
+        layoutNextZero = QHBoxLayout ()
+        layout.addLayout             ( layoutNextZero )
+        # force interpretation of html-characters with an <html> container
+        layoutNextZero.addWidget     ( QLabel( "<html>N&auml;chste Nullstelle:</html>" ) )
+        
+        self.nextZeroLabel = QLabel ()
+        layoutNextZero.addWidget( self.nextZeroLabel )
+        
+        # define point on function to be able and draw it only
+        # after user presses "go!"
+        self.pointOnFunction = False
+        
+        # same goes for "newPoint"
+        self.pointNew = False
+        
+
+        # signal - method connections
         
         self.setLayout              ( layout                                            )
         
@@ -147,6 +187,9 @@ class MainWindow( QDialog ):
                                                                 self.scaleIn            )
         self.connect                ( self.scaleOutButton, SIGNAL( "clicked()" ),
                                                                 self.scaleOut           )
+                                                                
+        self.connect                ( self.startButton, SIGNAL( "clicked()" ),
+                                                                self.startAnimation     )
                                                                 
         self.connect                (self.a, SIGNAL( "valueChanged(double)" ),
                                                                 self.updateUi           )
@@ -158,8 +201,11 @@ class MainWindow( QDialog ):
                                                                 
         self.connect                (self.d, SIGNAL( "valueChanged(double)" ),
                                                                 self.updateUi           )
-        
-        self.setWindowTitle         ( "Steigungen von Funktionen annaehernd bestimmen"  )
+                                                                
+        self.connect                (self.startX, SIGNAL( "valueChanged(double)" ),
+                                                                self.updateUi           )
+                                                                
+        self.setWindowTitle         ( "Nullstellen von Funktionen numerisch bestimmen"  )
         
     def scaleIn( self ):
         # it can scale in indefinitely..
@@ -172,6 +218,82 @@ class MainWindow( QDialog ):
         if self.scaleLevel > 0:
             self.ccs.scaleMe( 0.7 )
             self.scaleLevel -= 1
+            
+
+            
+    def startAnimation( self ):
+        
+        # to keep steps separated..
+        # user hits button repeatedly to see next step 
+        # of algorithm.
+        if self.nextStep == 0:
+            
+            if self.pointOnFunction:
+                self.pointOnFunction.setVisible( True )
+                self.pointOnFunction.set_x( self.startX.value() )
+            else:
+                # TODO make point non draggable!
+                self.pointOnFunction = self.ccs.addPointXFunction ( [self.startPoint],  self.startX.value(), self.function, 10 )
+            self.nextStep += 1
+            
+        elif self.nextStep == 1:
+            nextZero = self.nZ()
+            
+            # new point on x-axis.
+            if self.pointNew:
+                self.pointNew.set_x( nextZero )
+                
+                self.lineToNextXZero.setVisible( True )
+                self.ccs.update()
+                
+            else:
+                # first pass
+                nextZero = self.nZ()
+                self.pointNew = self.ccs.addPoint(nextZero,0, 0, 200,0,0)
+                self.pointNew.set_draggable( False )
+                self.lineToNextXZero = self.ccs.addLineDependent  ( self.pointNew, self.pointOnFunction , True, False, 'red', 2 )
+                self.ccs.update()
+            
+            self.nextStep += 1
+            
+        elif self.nextStep == 2:
+            nextZero = self.nZ()
+            self.nextZeroLabel.setText( str( nextZero ) )
+            
+            # just move old points to show only last iteration:
+            self.startPoint.set_x( nextZero )
+            self.startX.setValue ( nextZero )
+            self.nextStep += 1
+        
+        else:
+            
+            self.lineToNextXZero.setVisible( False )
+            self.pointOnFunction.setVisible( False )
+            self.ccs.update()
+            self.nextStep = 0
+            
+            
+        # TODO set "forward" button active
+        # TODO set function and startpoint inactiv
+        
+    def nZ( self ):
+        # x must be set because it is contained in the evaled string
+        x = self.startX.value()
+        function   = eval( self.function )
+        derivation = eval( self.derivation )
+            
+        # formula shown in script. :-)
+        # it is a prretty one which can be deduced with 
+        # affordable pain..
+        return self.startX.value() - function / derivation
+        
+    def wait( self ):
+        time.sleep( self.sleepTime )
+        
+    def reset( self ):
+        pass
+        # TODO enable app to reset itself so that
+        # function an startpoint can be changed
 
     def updateUi( self ):
         
@@ -186,12 +308,25 @@ class MainWindow( QDialog ):
         
         self.function += str( self.d.value())
         
-        print self.function
+        #~ print self.function
         self.functionPlot.redefine  ( self.function )
+        
+        self.startPoint.set_x( self.startX.value() )
+        #~ self.startPoint.setPosition()
+        
+        self.dn()
+        #~ self.functionPlot.redefine  ( self.derivation )
         
         self.ccs.update()
 
-
+    def dn( self ):
+        self.derivation = str (3*self.a.value())
+        self.derivation += "*x**2 + " 
+        self.derivation += str (2*self.b.value())
+        self.derivation += "*x + "
+        self.derivation += str (self.c.value())
+        #~ print "Derivation"
+        #~ print self.derivation
 
 
 app = QApplication(sys.argv)
