@@ -96,13 +96,13 @@ class Point(QGraphicsItem):
 
     def set_x(self, x):
         self.x = x
+        self.setPosition()
 
     def set_y(self, y):
         self.y = y
+        self.setPosition()
         
     def setPosition( self ):
-        #~ x = self.x
-        #~ y = self.y
         self.setPos ( CST.toCcsCoord(
             self.ccs, self.x, self.y )
         )
