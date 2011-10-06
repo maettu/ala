@@ -154,15 +154,22 @@ class MainWindow( QDialog ):
         self.startX.setSingleStep( 0.1 )
         self.startX.setDecimals( 10 )
         
-        layoutStart.addWidget                ( self.startX )
+        layoutStart.addWidget ( self.startX )
         layoutStart.addStretch()
+        
+        layoutNext = QHBoxLayout ()
+        layoutNext.addWidget ( QLabel( "<html>N&auml;chster Schritt:</html>" ) )
+        self.nextLabel = QLabel ( "Punkt auf Funktion bestimmen" )
+        layoutNext.addWidget( self.nextLabel )
+        layoutNext.addStretch()
         self.startButton  = QPushButton( "go!" )
-        layoutStart.addWidget( self.startButton )
+        layoutNext.addWidget( self.startButton )
         
         self.startPoint = self.ccs.addPoint(self.startX.value(),0, 10)
         self.startPoint.set_draggable( False )
         
         layoutNextZero = QHBoxLayout ()
+        layout.addLayout          ( layoutNext )
         layout.addLayout             ( layoutNextZero )
         # force interpretation of html-characters with an <html> container
         layoutNextZero.addWidget     ( QLabel( "<html>N&auml;chste Nullstelle:</html>" ) )
@@ -227,7 +234,7 @@ class MainWindow( QDialog ):
         # user hits button repeatedly to see next step 
         # of algorithm.
         if self.nextStep == 0:
-            
+            self.nextLabel.setText ( "Tangente bestimmen" )
             if self.pointOnFunction:
                 self.pointOnFunction.setVisible( True )
                 self.pointOnFunction.set_x( self.startX.value() )
@@ -238,12 +245,14 @@ class MainWindow( QDialog ):
             
         elif self.nextStep == 1:
             nextZero = self.nZ()
+            self.nextLabel.setText ( "<html>Startpunkt f&uuml;r n&auml;chste Iteration setzen</html>" )
             
             # new point on x-axis.
             if self.pointNew:
                 self.pointNew.set_x( nextZero )
                 
                 self.lineToNextXZero.setVisible( True )
+            
                 self.ccs.update()
                 
             else:
@@ -257,6 +266,7 @@ class MainWindow( QDialog ):
             self.nextStep += 1
             
         elif self.nextStep == 2:
+            self.nextLabel.setText ( "<html>Punkt auf Funktion und Tangente l&ouml;schen</html>" )
             nextZero = self.nZ()
             self.nextZeroLabel.setText( str( nextZero ) )
             
@@ -266,7 +276,7 @@ class MainWindow( QDialog ):
             self.nextStep += 1
         
         else:
-            
+            self.nextLabel.setText ( "erneut Punkt auf Funktion bestimmen" )
             self.lineToNextXZero.setVisible( False )
             self.pointOnFunction.setVisible( False )
             self.ccs.update()
@@ -308,7 +318,7 @@ class MainWindow( QDialog ):
         
         self.function += str( self.d.value())
         
-        #~ print self.function
+        print self.function
         self.functionPlot.redefine  ( self.function )
         
         self.startPoint.set_x( self.startX.value() )
@@ -316,6 +326,13 @@ class MainWindow( QDialog ):
         
         self.dn()
         #~ self.functionPlot.redefine  ( self.derivation )
+        
+        # reset "animation"
+        self.nextLabel.setText ( "Punkt auf Funktion bestimmen" )
+        self.nextStep = 0
+        self.lineToNextXZero.setVisible( False )
+        self.pointOnFunction.setVisible( False )
+
         
         self.ccs.update()
 
