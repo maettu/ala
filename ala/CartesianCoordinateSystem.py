@@ -47,6 +47,16 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         self.tickXOffset    = tickXOffset
         self.tickYOffset    = tickYOffset
         
+        # TODO, hardcoding is bad.
+        #~ self.ySkip          = 1
+        
+        # TODO: yRange needs to be adjusted to axis. start -7, skip = 2 -> Axis not drawn. Bad.
+        #~ self.yRange         = []
+        #~ for i in range (self.yMin-self.ySkip, self.yMax+2*self.ySkip):
+            #~ if i % self.ySkip == 0:
+                #~ self.yRange.append( i )
+                
+        
         # needed for explicit adds of elements like FunctionPlotter. How to get rid of this?
         self.scene = scene
         
@@ -95,7 +105,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         else:
             self.yAxis = self.height - ( self.height / (self.yMax - self.yMin) * -self.yMin ) - self.margin / 2
         
-        # make Rect a safely larger than window.
+        # make Rect safely larger than window.
         self.Rect = QRectF( 
             self.xMin - self.xAxis - 100, 
             self.yMin - self.yAxis - 100, 
@@ -113,7 +123,8 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
                 painter.setPen( ordinateColor )
             else:
                 painter.setPen( normalLineCol )
-                
+            
+            #~ if i == 0:
             painter.drawLine(
                 CST.toCcsCoord( self, i,self.yMin-1 ), 
                 CST.toCcsCoord( self, i,self.yMax+1 )
@@ -127,12 +138,15 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             )
 
         for i in range (self.yMin-1, self.yMax+2):
+        #~ for i in self.yRange :
+            #~ print i
             
             if i == 0:
                 painter.setPen(ordinateColor)
             else:
                 painter.setPen(normalLineCol)
             
+            #~ if i == 0:
             painter.drawLine(
                 CST.toCcsCoord( self, self.xMin-1,i ), 
                 CST.toCcsCoord( self, self.xMax+1,i )

@@ -52,7 +52,7 @@ class Line( QGraphicsLineItem ):
                 painter.setBackground ( QBrush ( QColor( 'lightGrey' ) ) )
                 painter.setBackgroundMode (Qt.BGMode(1))
                 painter.setPen( QColor( 'black' ) )
-                painter.drawText( self.ep.x() + 10, self.ep.y() + 10, QString ( '%.2f' %(incline) ) )
+                #~ painter.drawText( self.ep.x() + 10, self.ep.y() + 10, QString ( '%.2f' %(incline) ) )
         
     def updateYourself( self, xDelta, yDelta ):
         # There is no action needed, as a line gets its information
