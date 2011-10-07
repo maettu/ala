@@ -185,7 +185,7 @@ class MainWindow( QDialog ):
         # We can do so safely because it is set invisible.
         self.pointOnFunction = self.ccs.addPointXFunction ( [self.startPoint], 0, self.function, 10 )
         self.pointOnFunction.setVisible ( False )
-        # TODO make point non draggable!
+        self.pointOnFunction.set_draggable ( False )
         
         layoutNextZero = QHBoxLayout ()
         layout.addLayout          ( layoutNext )
