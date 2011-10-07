@@ -51,12 +51,14 @@ class MainWindow( QDialog ):
         # - ...
         self.nextStep = 0;
         
-        # TODO comment
+        # The starting point for the next iteration
+        # is altered during the iteration process.
+        # This fires the "startPoint changed" signal. 
+        # When changing the starting point manually, we
+        # want to reset the app and start a fresh iteration.
+        # When the starting point is changed automatically,
+        # the program can set resetApp False and no reset happens.
         self.resetApp = True
-        
-        # The animation is quite slow (on purpose)
-        # user has enough time to watch what is going on
-        self.sleepTime = 2
         
         scene = QGraphicsScene()
         scene.setSceneRect(0, 0, width, height)
@@ -230,10 +232,7 @@ class MainWindow( QDialog ):
             self.scaleLevel -= 1
             
 
-            
     def startAnimation( self ):
-        
-        print "Vorher: ", self.nextStep
         
         # to keep steps separated..
         # user hits button repeatedly to see next step 
@@ -290,8 +289,6 @@ class MainWindow( QDialog ):
             self.pointOnFunction.setVisible( False )
             self.ccs.update()
             self.nextStep = 0
-            
-        print "Nachher: ", self.nextStep
         
     def nZ( self ):
         # x must be set because it is contained in the evaled string
@@ -303,9 +300,6 @@ class MainWindow( QDialog ):
         # it is a prretty one which can be deduced with 
         # affordable pain..
         return self.startX.value() - function / derivation
-        
-    def wait( self ):
-        time.sleep( self.sleepTime )
         
     def reset( self ):
         # reset "animation"
@@ -348,10 +342,7 @@ class MainWindow( QDialog ):
         print self.function
         self.functionPlot.redefine  ( self.function )
         
-        #~ self.startPoint.set_x( self.startX.value() )
-        
         self.dn()
-        #~ self.functionPlot.redefine  ( self.derivation )
         
         self.reset()
         
