@@ -187,6 +187,12 @@ class MainWindow( QDialog ):
         self.pointOnFunction.setVisible ( False )
         self.pointOnFunction.set_draggable ( False )
         
+        # Add line and invisible point as well. Reason see above.
+        self.pointNew = self.ccs.addPoint(1,0, 0, 200,0,0)
+        self.pointNew.set_draggable( False )
+        self.lineToNextXZero = self.ccs.addLineDependent ( self.pointNew, self.pointOnFunction , True, False, 'red', 2 )
+        self.lineToNextXZero.setVisible ( False )
+        
         layoutNextZero = QHBoxLayout ()
         layout.addLayout          ( layoutNext )
         layout.addLayout             ( layoutNextZero )
@@ -195,11 +201,6 @@ class MainWindow( QDialog ):
         
         self.nextZeroLabel = QLabel ()
         layoutNextZero.addWidget( self.nextZeroLabel )
-
-        
-        # same goes for "newPoint"
-        self.pointNew = False
-        
 
         # signal - method connections
         
@@ -266,21 +267,12 @@ class MainWindow( QDialog ):
             nextZero = self.nZ()
             self.nextLabel.setText ( "<html>Startpunkt f&uuml;r n&auml;chste Iteration setzen</html>" )
             
-            # new point on x-axis.
-            if self.pointNew:
-                self.pointNew.set_x( nextZero )
-                
-                self.lineToNextXZero.setVisible( True )
+            self.pointNew.set_x( nextZero )
+            self.lineToNextXZero.setVisible( True )
             
-                self.ccs.update()
-                
-            else:
-                # first pass
-                nextZero = self.nZ()
-                self.pointNew = self.ccs.addPoint(nextZero,0, 0, 200,0,0)
-                self.pointNew.set_draggable( False )
-                self.lineToNextXZero = self.ccs.addLineDependent  ( self.pointNew, self.pointOnFunction , True, False, 'red', 2 )
-                self.ccs.update()
+            # make sure everything displays correctly.
+            # See comment above.
+            self.ccs.update()
             
             self.nextStep += 1
             
@@ -321,11 +313,8 @@ class MainWindow( QDialog ):
         # reset "animation"
         self.nextLabel.setText ( "Punkt auf Funktion bestimmen" )
         self.nextStep = 0
-        # line might not be initialized.
-        try:
-            self.lineToNextXZero.setVisible( False )
-        except:
-            pass
+
+        self.lineToNextXZero.setVisible( False )
         
         self.pointOnFunction.setVisible( False )
         self.pointOnFunction.redefine ( self.function )
