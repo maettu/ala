@@ -4,6 +4,8 @@
 # Yes, it is true: python insists on explicitly asking for unicode support
 # when using unicode characters in comments.
 
+from __future__ import unicode_literals
+
 from PyQt4.QtCore import (  Qt, 
                             QRectF, 
                             QPointF, 
@@ -26,7 +28,8 @@ from PyQt4.QtGui import (   QApplication,
                             QLabel, 
                             QBrush, 
                             QPainter,
-                            QDoubleSpinBox
+                            QDoubleSpinBox,
+                            QMessageBox
                         )
 
 import sys
@@ -309,8 +312,16 @@ class MainWindow( QDialog ):
         # tangent never crosses x-axis.
         # Therefore annoy user and reset app.
         if derivation == 0:
-            print "wooooo"
-            QMessageBox.warning( self, "bööööö", "nöööööö")
+            warning = "Am gewählten Startpunkt ist die Steigung der Funktion Null."
+            warning +="\nDie Tangente hat somit keine Steigung."
+            warning +="\nSie ist parallel zur x-Achse und schneidet diese nicht."
+            warning +="\nBitte einen anderen Startpunkt wählen!"
+            QMessageBox.warning( 
+                self, 
+                unicode( "Steigung ist Null" ), 
+                unicode( warning )
+            )
+            
             self.reset()
             return 0
             
