@@ -316,9 +316,6 @@ class MainWindow( QDialog ):
         except:
             pass
         
-        # TODO enable app to reset itself so that
-        # function an startpoint can be changed
-        
     def setStartPoint( self ):
         self.startPoint.set_x( self.startX.value() )
         if self.resetApp:
