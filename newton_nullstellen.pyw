@@ -60,6 +60,8 @@ class MainWindow( QDialog ):
         # the program can set resetApp False and no reset happens.
         self.resetApp = True
         
+        # Layout & widgets
+        # ----------------
         scene = QGraphicsScene()
         scene.setSceneRect(0, 0, width, height)
 
@@ -99,25 +101,25 @@ class MainWindow( QDialog ):
         # This is a somewhat narrow limitation but it is enough
         # for educational purposes.
         self.function ="1.0*x**3 + 4.0*x**2 + 2.0*x - 2.0"
+        self.functionPlot = self.ccs.addFunction ( self.function )
         
+        # calculate derivation
         self.dn()
         
-        # to make sure that one can not scale out more than original scale
+        # make sure that one can not scale out more than to original scale
         self.scaleLevel = 0
         
         self.scaleInButton  = QPushButton( "scale in" )
         self.scaleOutButton = QPushButton( "scale out" )
-
-        self.functionPlot = self.ccs.addFunction                          ( self.function                                   )
 
         scene.addItem                   ( self.ccs )
 
         layout = QVBoxLayout            ()
         
         
-        layoutOben = QHBoxLayout        ()
-        layoutOben.addWidget            ( self.scaleInButton )
-        layoutOben.addWidget            ( self.scaleOutButton )
+        layoutTop = QHBoxLayout        ()
+        layoutTop.addWidget            ( self.scaleInButton )
+        layoutTop.addWidget            ( self.scaleOutButton )
         
         # Buttons are auto activated by default. That means, that when <Enter>
         # is pressed anywhere, they fire clicked(), which is not what we need here.
@@ -126,7 +128,7 @@ class MainWindow( QDialog ):
         self.scaleInButton.setAutoDefault(False)
         self.scaleOutButton.setAutoDefault(False)
         
-        layout.addLayout                ( layoutOben )
+        layout.addLayout                ( layoutTop )
         
         layout.addWidget                ( view )
         
@@ -135,13 +137,16 @@ class MainWindow( QDialog ):
         layoutFunction = QHBoxLayout    ()
         layout.addLayout                ( layoutFunction )
         
-
+        # Spinboxes for the function
         layoutFunction.addWidget        ( self.a )
         layoutFunction.addWidget        ( self.x__3 )
+        
         layoutFunction.addWidget        ( self.b )
         layoutFunction.addWidget        ( self.x__2 )
+        
         layoutFunction.addWidget        ( self.c )
         layoutFunction.addWidget        ( self.x__1 )
+        
         layoutFunction.addWidget        ( self.d )
         
         layoutFunction.addStretch()
@@ -152,11 +157,11 @@ class MainWindow( QDialog ):
         layoutStart.addWidget     ( QLabel( "<html>Startpunkt f&uuml;r Ann&auml;herung:</html>" ) )
         
         # starting point for newton iteration
-        # can be changed until "go!" is pressed
         self.startX = QDoubleSpinBox()
         self.startX.setMinimum   ( -1000 )
         self.startX.setValue( 0 )
         self.startX.setSingleStep( 0.1 )
+        # make this spin box very precise!
         self.startX.setDecimals( 10 )
         
         layoutStart.addWidget ( self.startX )
@@ -164,14 +169,23 @@ class MainWindow( QDialog ):
         
         layoutNext = QHBoxLayout ()
         layoutNext.addWidget ( QLabel( "<html>N&auml;chster Schritt:</html>" ) )
+        # This label changes its text accordung to next step.
         self.nextLabel = QLabel ( "Punkt auf Funktion bestimmen" )
         layoutNext.addWidget( self.nextLabel )
         layoutNext.addStretch()
         self.startButton  = QPushButton( "go!" )
         layoutNext.addWidget( self.startButton )
+        self.startButton.setAutoDefault(False)
         
         self.startPoint = self.ccs.addPoint(self.startX.value(),0, 10)
         self.startPoint.set_draggable( False )
+        
+        # add the point on the function already to prevent from
+        # "object not defined" eroors later on.
+        # We can do so safely because it is set invisible.
+        self.pointOnFunction = self.ccs.addPointXFunction ( [self.startPoint], 0, self.function, 10 )
+        self.pointOnFunction.setVisible ( False )
+        # TODO make point non draggable!
         
         layoutNextZero = QHBoxLayout ()
         layout.addLayout          ( layoutNext )
@@ -181,10 +195,7 @@ class MainWindow( QDialog ):
         
         self.nextZeroLabel = QLabel ()
         layoutNextZero.addWidget( self.nextZeroLabel )
-        
-        # define point on function to be able and draw it only
-        # after user presses "go!"
-        self.pointOnFunction = False
+
         
         # same goes for "newPoint"
         self.pointNew = False
@@ -239,12 +250,16 @@ class MainWindow( QDialog ):
         # of algorithm.
         if self.nextStep == 0:
             self.nextLabel.setText ( "Tangente bestimmen" )
-            if self.pointOnFunction:
-                self.pointOnFunction.setVisible( True )
-                self.pointOnFunction.set_x( self.startX.value() )
-            else:
-                # TODO make point non draggable!
-                self.pointOnFunction = self.ccs.addPointXFunction ( [self.startPoint],  self.startX.value(), self.function, 10 )
+
+            self.pointOnFunction.setVisible( True )
+            self.pointOnFunction.set_x( self.startX.value() )
+            
+            # update whole coordinate system object for the case that
+            # pointOnFunction does not change coordinates when being set 
+            # visible (my happen at start of program, e.g., because 
+            # pointOnFunction already is correctly set).
+            self.ccs.update()
+            
             self.nextStep += 1
             
         elif self.nextStep == 1:
@@ -311,11 +326,9 @@ class MainWindow( QDialog ):
             self.lineToNextXZero.setVisible( False )
         except:
             pass
-        try:
-            self.pointOnFunction.setVisible( False )
-            self.pointOnFunction.redefine ( self.function )
-        except:
-            pass
+        
+        self.pointOnFunction.setVisible( False )
+        self.pointOnFunction.redefine ( self.function )
         
     def setStartPoint( self ):
         self.startPoint.set_x( self.startX.value() )
