@@ -166,7 +166,7 @@ class MainWindow( QDialog ):
         self.startX.setValue( 0 )
         self.startX.setSingleStep( 0.1 )
         # make this spin box very precise!
-        self.startX.setDecimals( 10 )
+        self.startX.setDecimals( 20 )
         
         layoutStart.addWidget ( self.startX )
         layoutStart.addStretch()
@@ -336,6 +336,8 @@ class MainWindow( QDialog ):
         self.nextStep = 0
 
         self.lineToNextXZero.setVisible( False )
+        
+        self.nextZeroLabel.setText( "" )
         
         self.pointOnFunction.setVisible( False )
         self.pointOnFunction.redefine ( self.function )
