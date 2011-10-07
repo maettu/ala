@@ -51,6 +51,9 @@ class MainWindow( QDialog ):
         # - ...
         self.nextStep = 0;
         
+        # TODO comment
+        self.resetApp = True
+        
         # The animation is quite slow (on purpose)
         # user has enough time to watch what is going on
         self.sleepTime = 2
@@ -230,6 +233,8 @@ class MainWindow( QDialog ):
             
     def startAnimation( self ):
         
+        print "Vorher: ", self.nextStep
+        
         # to keep steps separated..
         # user hits button repeatedly to see next step 
         # of algorithm.
@@ -272,6 +277,10 @@ class MainWindow( QDialog ):
             
             # just move old points to show only last iteration:
             self.startPoint.set_x( nextZero )
+            
+            # problem: this immediately triggers a "setStartPoint" which
+            # in turn triggers a reset(). hmpf
+            self.resetApp = False
             self.startX.setValue ( nextZero )
             self.nextStep += 1
         
@@ -282,9 +291,7 @@ class MainWindow( QDialog ):
             self.ccs.update()
             self.nextStep = 0
             
-            
-        # TODO set "forward" button active
-        # TODO set function and startpoint inactiv
+        print "Nachher: ", self.nextStep
         
     def nZ( self ):
         # x must be set because it is contained in the evaled string
@@ -304,20 +311,26 @@ class MainWindow( QDialog ):
         # reset "animation"
         self.nextLabel.setText ( "Punkt auf Funktion bestimmen" )
         self.nextStep = 0
+        # line might not be initialized.
         try:
             self.lineToNextXZero.setVisible( False )
         except:
             pass
-        self.pointOnFunction.setVisible( False )
-        self.ccs.update()
-
-        #~ pass
+        try:
+            self.pointOnFunction.setVisible( False )
+        except:
+            pass
+        
         # TODO enable app to reset itself so that
         # function an startpoint can be changed
         
     def setStartPoint( self ):
         self.startPoint.set_x( self.startX.value() )
-        self.reset()
+        if self.resetApp:
+            self.reset()
+        self.ccs.update()
+        
+        self.resetApp = True
 
     def updateUi( self ):
         
