@@ -56,8 +56,6 @@ class Line( QGraphicsLineItem ):
                     painter.setBackgroundMode (Qt.BGMode(1))
                     painter.setPen( QColor( 'black' ) )
                     #~ painter.drawText( self.ep.x() + 10, self.ep.y() + 10, QString ( '%.2f' %(incline) ) )
-        else:
-            print "no line shown"
                 
     def setVisible( self, value ):
         self.visible = value

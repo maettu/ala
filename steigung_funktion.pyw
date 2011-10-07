@@ -24,7 +24,7 @@ class MainWindow( QDialog ):
         view.setScene(scene)
         view.setRenderHint(QPainter.Antialiasing)
         
-        self.ccs = CartesianCoordinateSystemWidget(scene, width, height, 10, -5,5,-1,10)
+        self.ccs = CartesianCoordinateSystemWidget(scene, width, height, 10, 0,10,-1,10)
 
         self.editFormula = QLineEdit( function )
         self.editFormula.selectAll()
