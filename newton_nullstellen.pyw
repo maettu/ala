@@ -75,17 +75,17 @@ class MainWindow( QDialog ):
         self.a = QDoubleSpinBox()
         # set minimum to a (large) negative number. Default is 0..
         self.a.setMinimum   ( -1000 )
-        self.a.setValue( 1 )
+        self.a.setValue( 0 )
         self.a.setSingleStep( 0.1 )
         
         self.b = QDoubleSpinBox()
         self.b.setMinimum   ( -1000 )
-        self.b.setValue( 4 )
+        self.b.setValue( 1 )
         self.b.setSingleStep( 0.1 )
         
         self.c = QDoubleSpinBox()
         self.c.setMinimum   ( -1000 )
-        self.c.setValue( 2 )
+        self.c.setValue( 0 )
         self.c.setSingleStep( 0.1 )
         
         self.d = QDoubleSpinBox()
@@ -100,7 +100,10 @@ class MainWindow( QDialog ):
         # May be ax³ + bx² + cx + d and nothing else for this app.
         # This is a somewhat narrow limitation but it is enough
         # for educational purposes.
-        self.function ="1.0*x**3 + 4.0*x**2 + 2.0*x - 2.0"
+        #~ self.function ="1.0*x**3 + 4.0*x**2 + 2.0*x - 2.0"
+        #~ self.function ="0.0*x**3 + 1.0*x**2 + 0.0*x - 2.0"
+        self.fn()
+        
         self.functionPlot = self.ccs.addFunction ( self.function )
         
         # calculate derivation
@@ -303,6 +306,15 @@ class MainWindow( QDialog ):
         x = self.startX.value()
         function   = eval( self.function )
         derivation = eval( self.derivation )
+        
+        # Newton can not determine next zero if
+        # tangent never crosses x-axis.
+        # Therefore annoy user and reset app.
+        if derivation == 0:
+            print "wooooo"
+            QMessageBox.warning( self, "bööööö", "nöööööö")
+            self.reset()
+            return 0
             
         # formula shown in script. :-)
         # it is a prretty one which can be deduced with 
@@ -329,6 +341,28 @@ class MainWindow( QDialog ):
 
     def updateUi( self ):
         
+        #~ self.function = str( self.a.value())
+        #~ self.function += "*x**3 + "
+        
+        #~ self.function += str( self.b.value())
+        #~ self.function += "*x**2 + "
+        
+        #~ self.function += str( self.c.value())
+        #~ self.function += "*x + "
+        
+        #~ self.function += str( self.d.value())
+        
+        self.fn()
+        
+        self.functionPlot.redefine  ( self.function )
+        
+        self.dn()
+        
+        self.reset()
+        
+        self.ccs.update()
+        
+    def fn( self ):
         self.function = str( self.a.value())
         self.function += "*x**3 + "
         
@@ -339,14 +373,6 @@ class MainWindow( QDialog ):
         self.function += "*x + "
         
         self.function += str( self.d.value())
-        
-        self.functionPlot.redefine  ( self.function )
-        
-        self.dn()
-        
-        self.reset()
-        
-        self.ccs.update()
 
     def dn( self ):
         self.derivation = str (3*self.a.value())
