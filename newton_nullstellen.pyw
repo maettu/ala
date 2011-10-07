@@ -312,6 +312,7 @@ class MainWindow( QDialog ):
             pass
         try:
             self.pointOnFunction.setVisible( False )
+            self.pointOnFunction.redefine ( self.function )
         except:
             pass
         
@@ -354,8 +355,8 @@ class MainWindow( QDialog ):
         self.derivation += str (2*self.b.value())
         self.derivation += "*x + "
         self.derivation += str (self.c.value())
-        #~ print "Derivation"
-        #~ print self.derivation
+        print "Derivation"
+        print self.derivation
 
 
 app = QApplication(sys.argv)
