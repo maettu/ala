@@ -278,7 +278,8 @@ class MainWindow( QDialog ):
             self.startPoint.set_x( nextZero )
             
             # problem: this immediately triggers a "setStartPoint" which
-            # in turn triggers a reset(). hmpf
+            # in turn would trigger a reset(). Therefore resetApp is set to False
+            # which prohibits from resetting whole app.
             self.resetApp = False
             self.startX.setValue ( nextZero )
             self.nextStep += 1
@@ -337,7 +338,6 @@ class MainWindow( QDialog ):
         
         self.function += str( self.d.value())
         
-        print self.function
         self.functionPlot.redefine  ( self.function )
         
         self.dn()
@@ -352,8 +352,6 @@ class MainWindow( QDialog ):
         self.derivation += str (2*self.b.value())
         self.derivation += "*x + "
         self.derivation += str (self.c.value())
-        print "Derivation"
-        print self.derivation
 
 
 app = QApplication(sys.argv)
