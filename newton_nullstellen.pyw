@@ -72,6 +72,8 @@ class MainWindow( QDialog ):
         self.ccs = CartesianCoordinateSystemWidget(scene, width, height, 10, -5,5, -2,8)
 
         # the parameters of the function ax³ + bx² + cx + d
+        # The function can be ax³ + bx² + cx + d and nothing else for this app.
+        # This is a somewhat narrow limitation but it is enough.
         self.a = QDoubleSpinBox()
         # set minimum to a (large) negative number. Default is 0..
         self.a.setMinimum   ( -1000 )
@@ -97,11 +99,7 @@ class MainWindow( QDialog ):
         self.x__2 = QLabel( "x<sup>2</sup> +" )
         self.x__1 = QLabel( "x +" )
         
-        # May be ax³ + bx² + cx + d and nothing else for this app.
-        # This is a somewhat narrow limitation but it is enough
-        # for educational purposes.
-        #~ self.function ="1.0*x**3 + 4.0*x**2 + 2.0*x - 2.0"
-        #~ self.function ="0.0*x**3 + 1.0*x**2 + 0.0*x - 2.0"
+        # set function
         self.fn()
         
         self.functionPlot = self.ccs.addFunction ( self.function )
@@ -340,20 +338,7 @@ class MainWindow( QDialog ):
         self.resetApp = True
 
     def updateUi( self ):
-        
-        #~ self.function = str( self.a.value())
-        #~ self.function += "*x**3 + "
-        
-        #~ self.function += str( self.b.value())
-        #~ self.function += "*x**2 + "
-        
-        #~ self.function += str( self.c.value())
-        #~ self.function += "*x + "
-        
-        #~ self.function += str( self.d.value())
-        
         self.fn()
-        
         self.functionPlot.redefine  ( self.function )
         
         self.dn()
