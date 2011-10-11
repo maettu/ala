@@ -20,7 +20,10 @@ class Line( QGraphicsLineItem ):
         
         self.visible        = True
         
-        self.minLength      =  minLength # pixel
+        # by default we only want to draw lines if its two
+        # defining points are not too close together
+        self.drawAlways     = False
+        self.minLength      = minLength # pixel
         
         self.Rect = QRectF(self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y )
 
@@ -37,7 +40,7 @@ class Line( QGraphicsLineItem ):
             self.Rect = QRectF( self.sp, self.ep )
             self.line = QLineF( self.sp, self.ep )
             
-            if self.line.length() > self.minLength:
+            if self.line.length() > self.minLength or self.drawAlways == True:
                 
                 painter.drawLine( self.line )
             
