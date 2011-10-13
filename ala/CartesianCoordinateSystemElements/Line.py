@@ -47,9 +47,9 @@ class Line( QGraphicsLineItem ):
                 if self.paintToBorder == True:
 
                     # paint line to approximately the edge of the ccs.
-                    ep2 = self.line.pointAt( self.ccs.width / self.line.length() )
+                    ep2 = self.line.pointAt( self.ccs.width / self.line.length() * 2)
                     painter.drawLine(self.ep,ep2)
-                    sp2 = self.line.pointAt(-self.ccs.width / self.line.length() )
+                    sp2 = self.line.pointAt(-self.ccs.width / self.line.length() * 2)
                     painter.drawLine(self.sp,sp2)
             
                 if self.showIncline == True:
