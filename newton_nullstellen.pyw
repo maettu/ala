@@ -16,6 +16,7 @@
 from __future__ import unicode_literals
 
 from PyQt4.QtCore import (  Qt, 
+                            QRect,
                             QRectF, 
                             QPointF, 
                             QLineF, 
@@ -25,6 +26,7 @@ from PyQt4.QtCore import (  Qt,
                             QString
                         )
 from PyQt4.QtGui import (   QApplication, 
+                            QFrame,
                             QGraphicsScene, 
                             QGraphicsView, 
                             QGraphicsItem, 
@@ -57,7 +59,7 @@ class MainWindow( QDialog ):
         # (object) variable definitions
         # -----------------------------
         
-        width  = 520
+        width  = 550
         height = 520
         
         # user presses "go!" button, then one step
@@ -100,7 +102,7 @@ class MainWindow( QDialog ):
         self.a = QDoubleSpinBox()
         # set minimum to a (large) negative number. Default is 0..
         self.a.setMinimum   ( -1000 )
-        self.a.setValue( 0 )
+        self.a.setValue( 1 )
         self.a.setSingleStep( 0.1 )
         
         self.b = QDoubleSpinBox()
@@ -110,12 +112,12 @@ class MainWindow( QDialog ):
         
         self.c = QDoubleSpinBox()
         self.c.setMinimum   ( -1000 )
-        self.c.setValue( 0 )
+        self.c.setValue( -2 )
         self.c.setSingleStep( 0.1 )
         
         self.d = QDoubleSpinBox()
         self.d.setMinimum   ( -1000 )
-        self.d.setValue     ( -2 )
+        self.d.setValue     ( 0 )
         self.d.setSingleStep( 0.1 )
         
         self.x__3 = QLabel( "x<sup>3</sup> +" )
@@ -139,6 +141,7 @@ class MainWindow( QDialog ):
         scene.addItem                   ( self.ccs )
 
         layout = QVBoxLayout            ()
+        #~ layout.setGeometry (QRect(0,0,2000,1000))
         
         
         layoutTop = QHBoxLayout        ()
@@ -157,9 +160,11 @@ class MainWindow( QDialog ):
         layout.addWidget                ( view )
         
         layout.addWidget                ( QLabel( "Funktion: " ) )
-        
+
         layoutFunction = QHBoxLayout    ()
         layout.addLayout                ( layoutFunction )
+        
+        layoutFunction.addWidget        ( QLabel( "y = " ))
         
         # Spinboxes for the function
         layoutFunction.addWidget        ( self.a )
@@ -173,6 +178,10 @@ class MainWindow( QDialog ):
         
         layoutFunction.addWidget        ( self.d )
         
+        separator1 = QFrame()
+        separator1.setFrameStyle (QFrame.HLine)
+        layout.addWidget(separator1)
+        
         # a stretch takes as much space as possible and
         # shrinks other widgets as much as possible.
         layoutFunction.addStretch()
@@ -180,7 +189,7 @@ class MainWindow( QDialog ):
         layoutStart = QHBoxLayout ()
         layout.addLayout          ( layoutStart )
         # force interpretation of html-characters with an <html> container
-        layoutStart.addWidget     ( QLabel( "<html>Startpunkt f&uuml;r Ann&auml;herung:</html>" ) )
+        layoutStart.addWidget     ( QLabel( "<html>Startpunkt f&uuml;r Ann&auml;herung: x = </html>" ) )
         
         # starting point for newton iteration
         self.startX = QDoubleSpinBox()
@@ -190,18 +199,25 @@ class MainWindow( QDialog ):
         # make this spin box very precise!
         self.startX.setDecimals( 20 )
         
+        separator2 = QFrame()
+        separator2.setFrameStyle (QFrame.HLine)
+        layout.addWidget(separator2)
+        
+        
         layoutStart.addWidget ( self.startX )
         layoutStart.addStretch()
         
         layoutNext = QHBoxLayout ()
         layoutNext.addWidget ( QLabel( "<html>N&auml;chster Schritt:</html>" ) )
+        
         # This label changes its text accordung to next step.
         self.nextLabel = QLabel ( "Punkt auf Funktion bestimmen" )
         layoutNext.addWidget( self.nextLabel )
         layoutNext.addStretch()
-        self.startButton  = QPushButton( "go!" )
+        self.startButton  = QPushButton( "nächster Schritt" )
         layoutNext.addWidget( self.startButton )
         self.startButton.setAutoDefault(False)
+        
         
         self.startPoint = self.ccs.addPoint(self.startX.value(),0, 10)
         self.startPoint.set_draggable( False )
@@ -214,16 +230,25 @@ class MainWindow( QDialog ):
         self.pointOnFunction.set_draggable ( False )
         
         # Add line and invisible point as well. Reason see above.
-        self.pointNew = self.ccs.addPoint(1,0, 0, 200,0,0)
-        self.pointNew.set_draggable( False )
-        self.lineToNextXZero = self.ccs.addLineDependent ( self.pointNew, self.pointOnFunction , True, False, 'red', 2 )
+        #~ self.pointNew = self.ccs.addPoint(1,0, 0, 200,0,0)
+        #~ self.pointNew.set_draggable( False )
+        #~ self.lineToNextXZero = self.ccs.addLineDependent ( self.pointNew, self.pointOnFunction , True, False, 'red', 2 )
+        
+        self.otherPointOnTangent = self.ccs.addPoint( 1,0, 0, 200,0,0 )
+        self.otherPointOnTangent.set_draggable( False )
+        self.lineToNextXZero = self.ccs.addLineDependent ( self.otherPointOnTangent, self.pointOnFunction , True, False, 'red', 2 )
         self.lineToNextXZero.setVisible ( False )
         
         layoutNextZero = QHBoxLayout ()
         layout.addLayout          ( layoutNext )
+        
+        separator3 = QFrame()
+        separator3.setFrameStyle (QFrame.HLine)
+        layout.addWidget(separator3)
+        
         layout.addLayout             ( layoutNextZero )
         
-        layoutNextZero.addWidget     ( QLabel( "<html>N&auml;chste Nullstelle:</html>" ) )
+        layoutNextZero.addWidget     ( QLabel( "<html>N&auml;chste Ann&auml;herung f&uuml;r Nullstelle:</html>" ) )
         
         self.nextZeroLabel = QLabel ()
         layoutNextZero.addWidget( self.nextZeroLabel )
@@ -301,10 +326,18 @@ class MainWindow( QDialog ):
         
         # show tangent
         elif self.nextStep == 1:
-            nextZero = self.calculateNextZero()
+            #~ nextZero = self.calculateNextZero()
             self.nextLabel.setText ( "<html>Startpunkt f&uuml;r n&auml;chste Iteration setzen</html>" )
             
-            self.pointNew.set_x( nextZero )
+            #~ self.pointNew.set_x( nextZero )
+            
+            # The second point on tangent is "simply" 1 bigger than point on function.
+            # Its y-value is calculated with the derivation.
+            x = self.startX.value()
+            derivation = eval( self.derivation )
+            self.otherPointOnTangent.set_x( self.pointOnFunction.x + 1 )
+            self.otherPointOnTangent.set_y( self.pointOnFunction.y + derivation )
+            
             self.lineToNextXZero.setVisible( True )
             
             # make sure everything displays correctly.
