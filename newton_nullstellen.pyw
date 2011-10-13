@@ -141,7 +141,6 @@ class MainWindow( QDialog ):
         scene.addItem                   ( self.ccs )
 
         layout = QVBoxLayout            ()
-        #~ layout.setGeometry (QRect(0,0,2000,1000))
         
         
         layoutTop = QHBoxLayout        ()
@@ -230,10 +229,6 @@ class MainWindow( QDialog ):
         self.pointOnFunction.set_draggable ( False )
         
         # Add line and invisible point as well. Reason see above.
-        #~ self.pointNew = self.ccs.addPoint(1,0, 0, 200,0,0)
-        #~ self.pointNew.set_draggable( False )
-        #~ self.lineToNextXZero = self.ccs.addLineDependent ( self.pointNew, self.pointOnFunction , True, False, 'red', 2 )
-        
         self.otherPointOnTangent = self.ccs.addPoint( 1,0, 0, 200,0,0 )
         self.otherPointOnTangent.set_draggable( False )
         self.lineToNextXZero = self.ccs.addLineDependent ( self.otherPointOnTangent, self.pointOnFunction , True, False, 'red', 2 )
@@ -326,10 +321,7 @@ class MainWindow( QDialog ):
         
         # show tangent
         elif self.nextStep == 1:
-            #~ nextZero = self.calculateNextZero()
             self.nextLabel.setText ( "<html>Startpunkt f&uuml;r n&auml;chste Iteration setzen</html>" )
-            
-            #~ self.pointNew.set_x( nextZero )
             
             # The second point on tangent is "simply" 1 bigger than point on function.
             # Its y-value is calculated with the derivation.
