@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import math
+
 from Point import Point
 import ala.Helper.CoordinateSystemTransformation as CST
 

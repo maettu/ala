@@ -1,5 +1,7 @@
 #!/usr/bin/python
 
+import math
+
 from PyQt4.QtCore import (Qt, QLineF, QRectF, QPointF)
 from PyQt4.QtGui import (QGraphicsItem, QColor, QPen)
 

@@ -6,6 +6,7 @@ from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView,
     QLineEdit )
 
 import sys
+import math
 
 from ala.CartesianCoordinateSystem import CartesianCoordinateSystemWidget
 
@@ -106,7 +107,7 @@ class MainWindow( QDialog ):
     def updateUi( self ):
         try:
             # predefine x, because it is needed in eval
-            x = 0;
+            x = 1;
             
             # test if string evaluates correctly. I.E. no other
             # variables than x are allowed.
@@ -144,7 +145,8 @@ class MainWindow( QDialog ):
 app = QApplication(sys.argv)
 
 
-dialog = MainWindow( '2.718281828459045235**x' )
+#~ dialog = MainWindow( '2.718281828459045235**x' )
+dialog = MainWindow( 'math.sin(x)' )
 
 dialog.show()
 
