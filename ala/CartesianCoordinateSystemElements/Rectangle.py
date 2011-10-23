@@ -28,7 +28,6 @@ class Rectangle( QGraphicsRectItem ):
     def paint( self, painter, option, widget=None ):
         
         if self.visible == True:
-            print self.startPoint, self.endPoint
             painter.setPen( QColor( self.color ) )
             painter.setBrush( QColor( self.fillColor ) )
 

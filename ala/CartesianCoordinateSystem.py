@@ -255,6 +255,11 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         yParent.addChildPoint(point)
         return point
         
+    def addLine( self, startPoint, endPoint, paintToBorder = False, showIncline = False, color = 'orange', minLength = 0):
+        line = Line( startPoint, endPoint, self, paintToBorder, showIncline, color, minLength )
+        return line
+            
+        
     def addLineDependent( self, startPoint, endPoint, paintToBorder = False, showIncline = False, color = 'orange', minLength = 0):
         line = Line(
             startPoint, 
@@ -278,7 +283,7 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
             color
         )
         return rect
-
+        
     def addFunction( self, function ):
         self.function = FunctionPlotter( self, function )
         

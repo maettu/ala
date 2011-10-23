@@ -25,7 +25,12 @@ class Line( QGraphicsLineItem ):
         self.drawAlways     = False
         self.minLength      = minLength # pixel
         
-        self.Rect = QRectF(self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y )
+        # grmbl. Line was designed to be defined by two Point.Points. Now I want to be able to define
+        # lines as well from QPointFs. 
+        try:
+            self.Rect = QRectF( self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y )
+        except:
+            self.Rect = QRectF( self.startPoint.x(), self.startPoint.y(), self.endPoint.x(), self.endPoint.y() )
 
     def boundingRect( self ):
         return self.Rect
@@ -33,9 +38,14 @@ class Line( QGraphicsLineItem ):
     def paint( self, painter, option, widget=None ):
         if self.visible == True:
             painter.setPen( QColor( self.color ) )
-
-            self.sp = CST.toCcsCoord( self.ccs, self.startPoint.x, self.startPoint.y )
-            self.ep = CST.toCcsCoord( self.ccs, self.endPoint.x, self.endPoint.y )
+            
+            # see try-catch (pardon me) above
+            try:
+                self.sp = CST.toCcsCoord( self.ccs, self.startPoint.x, self.startPoint.y )
+                self.ep = CST.toCcsCoord( self.ccs, self.endPoint.x, self.endPoint.y )
+            except:
+                self.sp = CST.toCcsCoord( self.ccs, self.startPoint.x(), self.startPoint.y() )
+                self.ep = CST.toCcsCoord( self.ccs, self.endPoint.x(), self.endPoint.y() )
             
             self.Rect = QRectF( self.sp, self.ep )
             self.line = QLineF( self.sp, self.ep )
