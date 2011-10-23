@@ -10,6 +10,7 @@ from PyQt4.QtGui import (QApplication, QGraphicsScene, QGraphicsView,
 from CartesianCoordinateSystemElements.Point import Point
 from CartesianCoordinateSystemElements.PointXFunction import PointXFunction
 from CartesianCoordinateSystemElements.Line  import Line
+from CartesianCoordinateSystemElements.Rectangle  import Rectangle
 from CartesianCoordinateSystemElements.PointWithXFromOneParentAndYFromAnother import PointWithXFromOneParentAndYFromAnother
 from CartesianCoordinateSystemElements.FunctionPlotter import FunctionPlotter
 
@@ -268,6 +269,15 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         startPoint.addChildPoint(line)
         endPoint.addChildPoint(line)
         return line
+    
+    def addRectangle( self, startPoint, endPoint, color = 'blue' ):
+        rect = Rectangle(
+            startPoint,
+            endPoint,
+            self,
+            color
+        )
+        return rect
 
     def addFunction( self, function ):
         self.function = FunctionPlotter( self, function )
