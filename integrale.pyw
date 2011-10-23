@@ -98,6 +98,11 @@ class MainWindow( QDialog ):
         
         self.rectanglesFunction = []
         self.rectanglesIntegral = []
+        
+        self.numberRectanglesSpinBox = QDoubleSpinBox()
+        self.numberRectanglesSpinBox.setMinimum   ( 1 )
+        self.numberRectanglesSpinBox.setValue( 10 )
+        self.numberRectanglesSpinBox.setSingleStep( 1 )
        
 
         self.functionPlot = self.ccsFunction.addFunction( self.function )
@@ -106,7 +111,7 @@ class MainWindow( QDialog ):
         
         self.integralPlot = self.ccsIntegral.addFunction( self.integral )
         
-        # TODO: check that on scale out ccs expand
+        # TODO: check that on scale out ccs expand.
         
         
         self.scaleInButton  = QPushButton( "scale in" )
@@ -137,8 +142,10 @@ class MainWindow( QDialog ):
         layoutChangeFunction = QHBoxLayout   ()
         layout.addLayout                ( layoutChangeFunction )
         layoutChangeFunction.addWidget  ( self.editFunction                                  )
-        
         layoutChangeFunction.addWidget  ( self.editFunctionMessage                           )
+        
+        layoutChangeFunction.addWidget  ( self.numberRectanglesSpinBox )
+        
         layout.addWidget                ( viewIntegral )
         
         layout.addWidget                ( QLabel( "Funktion: " ) )
@@ -173,6 +180,9 @@ class MainWindow( QDialog ):
         self.connect                ( self.scaleOutButton, SIGNAL( "clicked()" ),
                                                                 self.scaleOut           )
                                                                 
+        self.connect                (self.numberRectanglesSpinBox, SIGNAL( "valueChanged(double)" ),
+                                                                self.changeFunction           )
+                                                                
                                                                 
         self.setWindowTitle         ( "Integrale anzeigen und raten"  )
         
@@ -201,6 +211,8 @@ class MainWindow( QDialog ):
     # When the function is changed it is redefined as well as the derivation,
     # then the app is reset.
     def changeFunction( self ):
+        
+        self.numberRectangles = self.numberRectanglesSpinBox.value()
         
         # erase bars & points
         for i in self.rectanglesFunction:
