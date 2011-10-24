@@ -32,6 +32,7 @@ from PyQt4.QtGui import (   QApplication,
                             QBrush, 
                             QPainter,
                             QSpinBox,
+                            QDoubleSpinBox,
                             QMessageBox
                         )
 
@@ -101,7 +102,7 @@ class MainWindow( QDialog ):
         
         self.numberRectanglesMax = 1000
         
-        # I did not succeed in removing rectangles (segfaluts..)
+        # I did not succeed in removing rectangles (segfaults..)
         # So, there are numberRectanglesMax rectangles predefined
         # which are setPosition and setVisible on changeFunction.
         # This is not preemptive optimization, this is a workaround.
@@ -121,6 +122,18 @@ class MainWindow( QDialog ):
         self.numberRectanglesSpinBox.setMaximum ( self.numberRectanglesMax )
         self.numberRectanglesSpinBox.setValue( 10 )
         self.numberRectanglesSpinBox.setSingleStep( 1 )
+        
+        self.lowerIntegrationBorderSpinBox = QDoubleSpinBox()
+        self.lowerIntegrationBorderSpinBox.setMinimum( -1000 )
+        self.lowerIntegrationBorderSpinBox.setMaximum( 1000 )
+        self.lowerIntegrationBorderSpinBox.setValue( self.start )
+        self.lowerIntegrationBorderSpinBox.setSingleStep( 0.01 )
+        
+        self.upperIntegrationBorderSpinBox = QDoubleSpinBox()
+        self.upperIntegrationBorderSpinBox.setMinimum( -1000 )
+        self.upperIntegrationBorderSpinBox.setMaximum( 1000 )
+        self.upperIntegrationBorderSpinBox.setValue( self.end )
+        self.upperIntegrationBorderSpinBox.setSingleStep( 0.01 )
        
 
         self.functionPlot = self.ccsFunction.addFunction( self.function )
@@ -157,12 +170,31 @@ class MainWindow( QDialog ):
         
         layout.addWidget                ( viewFunction )
         
-        layoutChangeFunction = QHBoxLayout   ()
+        layout.addWidget                ( QLabel( "Funktion: " ) )
+        
+        layoutChangeFunction = QHBoxLayout ()
         layout.addLayout                ( layoutChangeFunction )
         layoutChangeFunction.addWidget  ( self.editFunction                                  )
         layoutChangeFunction.addWidget  ( self.editFunctionMessage                           )
         
-        layoutChangeFunction.addWidget  ( self.numberRectanglesSpinBox )
+        layoutChangeNumberRectangles = QHBoxLayout()
+        layout.addLayout                ( layoutChangeNumberRectangles )
+        
+        layoutChangeNumberRectangles.addWidget ( QLabel( "Anzahl Rechtecke (Feinheit der Summe)" ) )
+        layoutChangeNumberRectangles.addWidget ( self.numberRectanglesSpinBox )
+        layoutChangeNumberRectangles.addStretch ()
+        
+        layoutIntegrationBorders = QHBoxLayout ()
+        layout.addLayout                ( layoutIntegrationBorders )
+        layoutIntegrationBorders.addWidget ( QLabel( "Untere Integrationsgrenze" ) )
+        layoutIntegrationBorders.addWidget ( self.lowerIntegrationBorderSpinBox )
+        
+        layoutIntegrationBorders.addWidget ( QLabel( "Obere Integrationsgrenze" ) )
+        layoutIntegrationBorders.addWidget ( self.upperIntegrationBorderSpinBox )
+        
+        separator = QFrame()
+        separator.setFrameStyle( QFrame.HLine )
+        layout.addWidget( separator )
         
         layout.addWidget                ( viewIntegral )
         
@@ -173,14 +205,8 @@ class MainWindow( QDialog ):
         
         layoutChangeIntegral.addWidget  ( self.editIntegralMessage                           )
         
-        
-        
-        
 
-        
-        separator3 = QFrame()
-        separator3.setFrameStyle (QFrame.HLine)
-        layout.addWidget(separator3)
+
         
         self.setLayout              ( layout )
 
@@ -199,6 +225,12 @@ class MainWindow( QDialog ):
                                                                 self.scaleOut           )
                                                                 
         self.connect                (self.numberRectanglesSpinBox, SIGNAL( "valueChanged(int)" ),
+                                                                self.changeFunction           )
+                                                                
+        self.connect                (self.lowerIntegrationBorderSpinBox, SIGNAL( "valueChanged(double)" ),
+                                                                self.changeFunction           )
+                                                                
+        self.connect                (self.upperIntegrationBorderSpinBox, SIGNAL( "valueChanged(double)" ),
                                                                 self.changeFunction           )
                                                                 
                                                                 
@@ -240,18 +272,21 @@ class MainWindow( QDialog ):
         # ySum is the sum of all rectangles below the function
         ySum = 0
         
+        # set all values (lazyness)
         self.numberRectangles = self.numberRectanglesSpinBox.value()
+        self.start = self.lowerIntegrationBorderSpinBox.value()
+        self.end = self.upperIntegrationBorderSpinBox.value()
         
         # iterate over the number of rectangles, set their position and
         # make them visible.
         for i in range( self.numberRectangles ):
             # x i "in the middle" of a rectangle.
             # x is the variable in the function string and gets eval'ed
-            x = float( self.end - self.start ) / self.numberRectangles * (i + 0.5)
+            x = self.start + float( self.end - self.start ) / self.numberRectangles * (i + 0.5)
             
             # x1 is "on the left" of a rectangle, x2 is "on the right"
-            x1 = float( self.end - self.start ) / self.numberRectangles * ( i )
-            x2 = float( self.end - self.start ) / self.numberRectangles * (i+1)
+            x1 = self.start + float( self.end - self.start ) / self.numberRectangles * ( i )
+            x2 = self.start + float( self.end - self.start ) / self.numberRectangles * (i+1)
             
             self.rectanglesFunction[i].setPosition( QPointF( x1, 0) , QPointF( x2, eval( self.function ) ) )
             self.rectanglesFunction[i].setVisible( True )
