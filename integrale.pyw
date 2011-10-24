@@ -31,7 +31,7 @@ from PyQt4.QtGui import (   QApplication,
                             QLabel, 
                             QBrush, 
                             QPainter,
-                            QDoubleSpinBox,
+                            QSpinBox,
                             QMessageBox
                         )
 
@@ -99,7 +99,7 @@ class MainWindow( QDialog ):
         self.rectanglesFunction = []
         self.rectanglesIntegral = []
         
-        self.numberRectanglesSpinBox = QDoubleSpinBox()
+        self.numberRectanglesSpinBox = QSpinBox()
         self.numberRectanglesSpinBox.setMinimum   ( 1 )
         self.numberRectanglesSpinBox.setValue( 10 )
         self.numberRectanglesSpinBox.setSingleStep( 1 )
@@ -180,7 +180,7 @@ class MainWindow( QDialog ):
         self.connect                ( self.scaleOutButton, SIGNAL( "clicked()" ),
                                                                 self.scaleOut           )
                                                                 
-        self.connect                (self.numberRectanglesSpinBox, SIGNAL( "valueChanged(double)" ),
+        self.connect                (self.numberRectanglesSpinBox, SIGNAL( "valueChanged(int)" ),
                                                                 self.changeFunction           )
                                                                 
                                                                 
@@ -217,6 +217,10 @@ class MainWindow( QDialog ):
         # erase bars & points
         for i in self.rectanglesFunction:
             self.sceneFunction.removeItem( i )
+        #~ while self.rectanglesFunction:
+            #~ item = self.rectanglesFunction.pop()
+            #~ self.sceneFunction.removeItem( item )
+            #~ del item
             
         # TODO: really delete objects without segfaulting
         
@@ -231,6 +235,7 @@ class MainWindow( QDialog ):
         #~ print ( float (self.end - self.start) / self.numberRectangles )
         
         for i in range( self.numberRectangles ):
+        #~ for i in range( 10 ):
             x = float( self.end - self.start ) / self.numberRectangles * (i + 0.5)
             
             x1 = float( self.end - self.start ) / self.numberRectangles * ( i )
