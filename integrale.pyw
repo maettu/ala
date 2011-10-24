@@ -57,6 +57,8 @@ class MainWindow( QDialog ):
         # General setup
         # -------------
         
+        self.scaleLevel = 0
+        
         self.sceneFunction = QGraphicsScene()
         self.sceneFunction.setSceneRect( 0, 0, width, height/3 )
         
@@ -241,12 +243,14 @@ class MainWindow( QDialog ):
     def scaleIn( self ):
         self.ccsFunction.scaleMe( 1.4 )
         self.ccsIntegral.scaleMe( 1.4 )
+        self.scaleLevel += 1
         
         
     def scaleOut( self ):
+        if self.scaleLevel > 0:
             self.ccsFunction.scaleMe( 0.7 )
             self.ccsIntegral.scaleMe( 0.7 )
-            
+            self.scaleLevel -= 1
             
         
     # reset the app.
