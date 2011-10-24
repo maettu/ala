@@ -170,6 +170,8 @@ class MainWindow( QDialog ):
         
         layout.addLayout                ( layoutTop )
         
+        layout.addWidget( QLabel( "Funktion und Rechtecke auf Funktion" ) )
+        
         layout.addWidget                ( viewFunction )
         
         layout.addWidget                ( QLabel( "Funktion: " ) )
@@ -261,93 +263,82 @@ class MainWindow( QDialog ):
     # When the function is changed it is redefined as well as the derivation,
     # then the app is reset.
     def changeFunction( self ):
+        # somewhat lazy input validation: set x=1 and testEval function
+        try:
+            # predefine x, because it is needed in eval
+            x = 1;
+            testEval = eval( str( self.editFunction.text() ) )
+            ok = True
+            # if eval is o.k., then print "ok"
+            self.editFunctionMessage.setText("ok")
+        except:
+            self.editFunctionMessage.setText("Fehler in der Funktion.")
+            ok = False
         
-        # All rectangles under the function and all lines on the
-        # integral are set invisible. 
-        for i in range ( self.numberRectanglesMax ):
-            self.rectanglesFunction[i].setVisible( False ) 
-            self.rectanglesIntegral[i].setVisible( False )
+        if ok:
+            # All rectangles under the function and all lines on the
+            # integral are set invisible. 
+            for i in range ( self.numberRectanglesMax ):
+                self.rectanglesFunction[i].setVisible( False ) 
+                self.rectanglesIntegral[i].setVisible( False )
+            
+            # the function is redefined and painted.
+            # TODO: this needs some input validation..
+            self.function = str( self.editFunction.text() )
+            self.functionPlot.redefine  ( self.function )
+            
+            # ySum is the sum of all rectangles below the function
+            ySum = 0
+            
+            # set all values (lazyness)
+            self.numberRectangles = self.numberRectanglesSpinBox.value()
+            self.start = self.lowerIntegrationBorderSpinBox.value()
+            self.end = self.upperIntegrationBorderSpinBox.value()
+            
+            # iterate over the number of rectangles, set their position and
+            # make them visible.
+            for i in range( self.numberRectangles ):
+                # x i "in the middle" of a rectangle.
+                # x is the variable in the function string and gets eval'ed
+                x = self.start + float( self.end - self.start ) / self.numberRectangles * (i + 0.5)
+                
+                # x1 is "on the left" of a rectangle, x2 is "on the right"
+                x1 = self.start + float( self.end - self.start ) / self.numberRectangles * ( i )
+                x2 = self.start + float( self.end - self.start ) / self.numberRectangles * (i+1)
+                
+                self.rectanglesFunction[i].setPosition( QPointF( x1, 0) , QPointF( x2, eval( self.function ) ) )
+                self.rectanglesFunction[i].setVisible( True )
+                
+                # simply add sum up
+                ySum = ySum + eval( self.function )
+                
+                # The value of the integral is dependent on the whole range and the number
+                # of rectangles. 
+                y = float( ySum ) * ( float (self.end - self.start) / self.numberRectangles )
+                
+                self.rectanglesIntegral[i].setPosition( QPointF(x1, y), QPointF(x2,y) ) 
+                self.rectanglesIntegral[i].setVisible( True )
+            
+            self.reset()
         
-        # the function is redefined and painted.
-        # TODO: this needs some input validation..
-        self.function = str( self.editFunction.text() )
-        self.functionPlot.redefine  ( self.function )
-        
-        # ySum is the sum of all rectangles below the function
-        ySum = 0
-        
-        # set all values (lazyness)
-        self.numberRectangles = self.numberRectanglesSpinBox.value()
-        self.start = self.lowerIntegrationBorderSpinBox.value()
-        self.end = self.upperIntegrationBorderSpinBox.value()
-        
-        # iterate over the number of rectangles, set their position and
-        # make them visible.
-        for i in range( self.numberRectangles ):
-            # x i "in the middle" of a rectangle.
-            # x is the variable in the function string and gets eval'ed
-            x = self.start + float( self.end - self.start ) / self.numberRectangles * (i + 0.5)
-            
-            # x1 is "on the left" of a rectangle, x2 is "on the right"
-            x1 = self.start + float( self.end - self.start ) / self.numberRectangles * ( i )
-            x2 = self.start + float( self.end - self.start ) / self.numberRectangles * (i+1)
-            
-            self.rectanglesFunction[i].setPosition( QPointF( x1, 0) , QPointF( x2, eval( self.function ) ) )
-            self.rectanglesFunction[i].setVisible( True )
-            
-            # simply add sum up
-            ySum = ySum + eval( self.function )
-            
-            # The value of the integral is dependent on the whole range and the number
-            # of rectangles. 
-            y = float( ySum ) * ( float (self.end - self.start) / self.numberRectangles )
-            
-            self.rectanglesIntegral[i].setPosition( QPointF(x1, y), QPointF(x2,y) ) 
-            self.rectanglesIntegral[i].setVisible( True )
-        
-        self.reset()
-        
-        # TODO: put this in to check eval before applying ;-)
-        
-        #~ try:
-            #~ # predefine x, because it is needed in eval
-            #~ x = 1;
-            
-            #~ # test if string evaluates correctly. I.E. no other
-            #~ # variables than x are allowed.
-            
-            #~ # TODO: eulers number: replace 'e' with 2.71.. 
-            #~ testEval = eval( str( self.editFunction.text() ) )
-            
-            #~ self.function = str( self.editFunction.text() )
-            
-            #~ self.displayMessage.setText("ok")
-            
-            #~ self.functionPlot.redefine  ( self.function )
-            #~ self.point1.redefine        ( self.function )
-            #~ self.point2.redefine        ( self.function )
-            
-            #~ # just give it any yDelta..
-            #~ self.point1.updateYourself  ( -self.point1.x ,1     )
-            #~ self.point2.updateYourself  ( 1 - self.point2.x,1   )
-            #~ self.point3.updateYourself  ( 1,1                   )
-            
-            
-
-            #~ self.ccs.update()
-            
-        #~ except:
-            #~ text = self.editFunction.text() 
-            
-            #~ self.editFunction.setText    ( text )
-            #~ self.displayMessage.setText ("nicht evaluierbar")
-            
-    # TODO: This needs some input validation, too
     def changeIntegral( self ):
-        self.integral = str( self.editIntegral.text() )
-        self.integralPlot.redefine( self.integral )
-
-
+        try:
+            # predefine x, because it is needed in eval
+            x = 1;
+            testEval = eval( str( self.editIntegral.text() ) )
+            ok = True
+            # if eval is o.k., then print "ok"
+            self.editIntegralMessage.setText("ok")
+        except:
+            self.editIntegralMessage.setText("Fehler in der Funktion.")
+            ok = False
+            
+        if ok:
+            self.integral = str( self.editIntegral.text() )
+            self.integralPlot.redefine( self.integral )
+            self.reset()
+            
+            
 # main program
 # ------------
 
