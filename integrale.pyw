@@ -99,8 +99,21 @@ class MainWindow( QDialog ):
         self.rectanglesFunction = []
         self.rectanglesIntegral = []
         
+        self.numberRectanglesMax = 1000
+        
+        # I did not succeed in removing rectangles (segfaluts..)
+        # So, there are numberRectanglesMax rectangles predefined
+        # which are setPosition and setVisible on changeFunction.
+        # This is not preemptive optimization, this is a workaround.
+        for i in range ( self.numberRectanglesMax ):
+            self.rectanglesFunction.append( self.ccsFunction.addRectangle( 
+                    QPointF( 0, 0 ) , QPointF( 1, 0 ) ) 
+            ) 
+            self.rectanglesFunction[i].setVisible( False ) 
+        
         self.numberRectanglesSpinBox = QSpinBox()
-        self.numberRectanglesSpinBox.setMinimum   ( 1 )
+        self.numberRectanglesSpinBox.setMinimum ( 1 )
+        self.numberRectanglesSpinBox.setMaximum ( self.numberRectanglesMax )
         self.numberRectanglesSpinBox.setValue( 10 )
         self.numberRectanglesSpinBox.setSingleStep( 1 )
        
@@ -214,18 +227,9 @@ class MainWindow( QDialog ):
         
         self.numberRectangles = self.numberRectanglesSpinBox.value()
         
-        # erase bars & points
-        for i in self.rectanglesFunction:
-            self.sceneFunction.removeItem( i )
-        #~ while self.rectanglesFunction:
-            #~ item = self.rectanglesFunction.pop()
-            #~ self.sceneFunction.removeItem( item )
-            #~ del item
-            
-        # TODO: really delete objects without segfaulting
+        for i in range ( self.numberRectanglesMax ):
+            self.rectanglesFunction[i].setVisible( False ) 
         
-        for i in self.rectanglesIntegral:
-            self.sceneIntegral.removeItem( i )
         
         self.function = str( self.editFunction.text() )
         self.functionPlot.redefine  ( self.function )
@@ -234,6 +238,8 @@ class MainWindow( QDialog ):
         
         #~ print ( float (self.end - self.start) / self.numberRectangles )
         
+       
+        
         for i in range( self.numberRectangles ):
         #~ for i in range( 10 ):
             x = float( self.end - self.start ) / self.numberRectangles * (i + 0.5)
@@ -241,10 +247,11 @@ class MainWindow( QDialog ):
             x1 = float( self.end - self.start ) / self.numberRectangles * ( i )
             x2 = float( self.end - self.start ) / self.numberRectangles * (i+1)
             
-    
-            self.rectanglesFunction.append( self.ccsFunction.addRectangle( 
-                    QPointF( x1, 0) , QPointF( x2, eval( self.function ) ) 
-                ) )
+            self.rectanglesFunction[i].setPosition( QPointF( x1, 0) , QPointF( x2, eval( self.function ) ) )
+            self.rectanglesFunction[i].setVisible( True )
+            
+            
+          
             
             ySum = ySum + eval( self.function )
            

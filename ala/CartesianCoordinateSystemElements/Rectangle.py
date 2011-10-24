@@ -37,6 +37,10 @@ class Rectangle( QGraphicsRectItem ):
             self.Rect = QRectF( self.sp, self.ep )
             
             painter.drawRect( self.Rect )
+    
+    def setPosition( self, startPoint, endPoint ):
+        self.startPoint = startPoint
+        self.endPoint   = endPoint
                 
     def setVisible( self, value ):
         self.visible = value
