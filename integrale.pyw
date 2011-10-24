@@ -65,17 +65,21 @@ class MainWindow( QDialog ):
         self.sceneIntegral = QGraphicsScene()
         self.sceneIntegral.setSceneRect( 0, 0, width, height/3 )
 
-        viewFunction = QGraphicsView()
-        viewFunction.setScene(self.sceneFunction)
-        viewFunction.setRenderHint(QPainter.Antialiasing)
+        viewFunction = QGraphicsView                ()
+        viewFunction.setScene                       ( self.sceneFunction    )
+        viewFunction.setRenderHint                  ( QPainter.Antialiasing )
+        viewFunction.setHorizontalScrollBarPolicy   ( Qt.ScrollBarAlwaysOff )
+        viewFunction.setVerticalScrollBarPolicy     ( Qt.ScrollBarAlwaysOff )
         
         self.ccsFunction = CartesianCoordinateSystemWidget( self.sceneFunction, width, height/3, 10, -5,5, -2,8 )
         
         self.ccsIntegral = CartesianCoordinateSystemWidget( self.sceneIntegral, width, height/3, 10, -5,5, -2,8 )
         
-        viewIntegral = QGraphicsView()
-        viewIntegral.setScene(self.sceneIntegral)
-        viewIntegral.setRenderHint(QPainter.Antialiasing)
+        viewIntegral = QGraphicsView                ()
+        viewIntegral.setScene                       ( self.sceneIntegral    )
+        viewIntegral.setRenderHint                  ( QPainter.Antialiasing )
+        viewIntegral.setHorizontalScrollBarPolicy   ( Qt.ScrollBarAlwaysOff )
+        viewIntegral.setVerticalScrollBarPolicy     ( Qt.ScrollBarAlwaysOff )
         
         
         # Layout & widgets
