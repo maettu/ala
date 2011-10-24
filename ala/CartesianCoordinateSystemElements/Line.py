@@ -73,6 +73,10 @@ class Line( QGraphicsLineItem ):
     def setVisible( self, value ):
         self.visible = value
         
+    def setPosition( self, startPoint, endPoint ):
+        self.startPoint = startPoint
+        self.endPoint   = endPoint
+        
     def updateYourself( self, xDelta, yDelta ):
         # There is no action needed, as a line gets its information
         # from startPoint and endPoint

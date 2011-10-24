@@ -110,6 +110,11 @@ class MainWindow( QDialog ):
                     QPointF( 0, 0 ) , QPointF( 1, 0 ) ) 
             ) 
             self.rectanglesFunction[i].setVisible( False ) 
+            
+            self.rectanglesIntegral.append( 
+                    self.ccsIntegral.addLine( QPointF(0,0), QPointF(1,0), False, False, 'blue' ) 
+            )
+            self.rectanglesIntegral[i].setVisible( False ) 
         
         self.numberRectanglesSpinBox = QSpinBox()
         self.numberRectanglesSpinBox.setMinimum ( 1 )
@@ -205,7 +210,7 @@ class MainWindow( QDialog ):
         # it can scale in indefinitely..
         self.ccsFunction.scaleMe( 1.4 )
         self.ccsIntegral.scaleMe( 1.4 )
-        self.scaleLevel += 1
+        
         
     def scaleOut( self ):
         # .. whereas it can't scale out more than
@@ -213,7 +218,7 @@ class MainWindow( QDialog ):
         #~ if self.scaleLevel > 0:
             self.ccsFunction.scaleMe( 0.7 )
             self.ccsIntegral.scaleMe( 0.7 )
-            self.scaleLevel -= 1
+            
             
         
     # reset the app.
@@ -229,19 +234,14 @@ class MainWindow( QDialog ):
         
         for i in range ( self.numberRectanglesMax ):
             self.rectanglesFunction[i].setVisible( False ) 
-        
+            self.rectanglesIntegral[i].setVisible( False )
         
         self.function = str( self.editFunction.text() )
         self.functionPlot.redefine  ( self.function )
         
         ySum = 0
         
-        #~ print ( float (self.end - self.start) / self.numberRectangles )
-        
-       
-        
         for i in range( self.numberRectangles ):
-        #~ for i in range( 10 ):
             x = float( self.end - self.start ) / self.numberRectangles * (i + 0.5)
             
             x1 = float( self.end - self.start ) / self.numberRectangles * ( i )
@@ -250,15 +250,12 @@ class MainWindow( QDialog ):
             self.rectanglesFunction[i].setPosition( QPointF( x1, 0) , QPointF( x2, eval( self.function ) ) )
             self.rectanglesFunction[i].setVisible( True )
             
-            
-          
-            
             ySum = ySum + eval( self.function )
            
             y = float( ySum ) * ( float (self.end - self.start) / self.numberRectangles )
             
-            #~ self.rectanglesIntegral.append( self.ccsIntegral.addPoint( x, y, 1, 0, 0, 200 ) )
-            self.rectanglesIntegral.append( self.ccsIntegral.addLine( QPointF(x1, y), QPointF(x2,y), False, False, 'black' ) )
+            self.rectanglesIntegral[i].setPosition( QPointF(x1, y), QPointF(x2,y) ) 
+            self.rectanglesIntegral[i].setVisible( True )
         
         self.reset()
         
