@@ -207,15 +207,11 @@ class MainWindow( QDialog ):
     
     # methods for scaling the whole app in and out
     def scaleIn( self ):
-        # it can scale in indefinitely..
         self.ccsFunction.scaleMe( 1.4 )
         self.ccsIntegral.scaleMe( 1.4 )
         
         
     def scaleOut( self ):
-        # .. whereas it can't scale out more than
-        # original scale
-        #~ if self.scaleLevel > 0:
             self.ccsFunction.scaleMe( 0.7 )
             self.ccsIntegral.scaleMe( 0.7 )
             
@@ -230,36 +226,47 @@ class MainWindow( QDialog ):
     # then the app is reset.
     def changeFunction( self ):
         
-        self.numberRectangles = self.numberRectanglesSpinBox.value()
-        
+        # All rectangles under the function and all lines on the
+        # integral are set invisible. 
         for i in range ( self.numberRectanglesMax ):
             self.rectanglesFunction[i].setVisible( False ) 
             self.rectanglesIntegral[i].setVisible( False )
         
+        # the function is redefined and painted.
+        # TODO: this needs some input validation..
         self.function = str( self.editFunction.text() )
         self.functionPlot.redefine  ( self.function )
         
+        # ySum is the sum of all rectangles below the function
         ySum = 0
         
+        self.numberRectangles = self.numberRectanglesSpinBox.value()
+        
+        # iterate over the number of rectangles, set their position and
+        # make them visible.
         for i in range( self.numberRectangles ):
+            # x i "in the middle" of a rectangle.
+            # x is the variable in the function string and gets eval'ed
             x = float( self.end - self.start ) / self.numberRectangles * (i + 0.5)
             
+            # x1 is "on the left" of a rectangle, x2 is "on the right"
             x1 = float( self.end - self.start ) / self.numberRectangles * ( i )
             x2 = float( self.end - self.start ) / self.numberRectangles * (i+1)
             
             self.rectanglesFunction[i].setPosition( QPointF( x1, 0) , QPointF( x2, eval( self.function ) ) )
             self.rectanglesFunction[i].setVisible( True )
             
+            # simply add sum up
             ySum = ySum + eval( self.function )
-           
+            
+            # The value of the integral is dependent on the whole range and the number
+            # of rectangles. 
             y = float( ySum ) * ( float (self.end - self.start) / self.numberRectangles )
             
             self.rectanglesIntegral[i].setPosition( QPointF(x1, y), QPointF(x2,y) ) 
             self.rectanglesIntegral[i].setVisible( True )
         
         self.reset()
-        
-        self.ccsFunction.update()
         
         # TODO: put this in to check eval before applying ;-)
         
@@ -295,6 +302,8 @@ class MainWindow( QDialog ):
             
             #~ self.editFunction.setText    ( text )
             #~ self.displayMessage.setText ("nicht evaluierbar")
+            
+    # TODO: This needs some input validation, too
     def changeIntegral( self ):
         self.integral = str( self.editIntegral.text() )
         self.integralPlot.redefine( self.integral )
