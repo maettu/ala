@@ -16,7 +16,6 @@
 from __future__ import unicode_literals
 
 from PyQt4.QtCore import (  Qt, 
-                            QRect,
                             QRectF, 
                             QPointF, 
                             QLineF, 
@@ -87,9 +86,11 @@ class MainWindow( QDialog ):
         scene = QGraphicsScene()
         scene.setSceneRect(0, 0, width, height)
 
-        view = QGraphicsView()
-        view.setScene(scene)
-        view.setRenderHint(QPainter.Antialiasing)
+        view = QGraphicsView                ()
+        view.setScene                       ( scene                 )
+        view.setRenderHint                  ( QPainter.Antialiasing )
+        view.setHorizontalScrollBarPolicy   ( Qt.ScrollBarAlwaysOff )
+        view.setVerticalScrollBarPolicy     ( Qt.ScrollBarAlwaysOff )
         
         self.ccs = CartesianCoordinateSystemWidget(scene, width, height, 10, -5,5, -2,8)
         
