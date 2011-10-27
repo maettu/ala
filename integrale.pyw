@@ -119,6 +119,8 @@ class MainWindow( QDialog ):
                     QPointF( 0, 0 ) , QPointF( 1, 0 ) ) 
             ) 
             self.rectanglesFunction[i].setVisible( False ) 
+            # sets rectangle behind functionPlot
+            self.rectanglesFunction[i].setZValue( 2 )
             
             #~ self.rectanglesIntegral.append( 
                     #~ self.ccsIntegral.addLine( QPointF(0,0), QPointF(1,0), False, False, 'blue' ) 
@@ -128,6 +130,7 @@ class MainWindow( QDialog ):
                 self.ccsIntegral.addPoint( 0, 0, 5, 0, 0, 200 )
             )
             self.pointsIntegral[i].setVisible( False )
+            self.pointsIntegral[i].setZValue( 2 )
         
         self.numberRectanglesSpinBox = QSpinBox()
         self.numberRectanglesSpinBox.setMinimum ( 1 )
@@ -149,10 +152,12 @@ class MainWindow( QDialog ):
        
 
         self.functionPlot = self.ccsFunction.addFunction( self.function )
+        self.functionPlot.setZValue( 1 )
         
         self.changeFunction()
         
         self.integralPlot = self.ccsIntegral.addFunction( self.integral )
+        self.integralPlot.setZValue( 1 )
         
         self.scaleInButton  = QPushButton( "scale in" )
         self.scaleOutButton = QPushButton( "scale out" )
