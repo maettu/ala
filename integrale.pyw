@@ -38,6 +38,7 @@ from PyQt4.QtGui import (   QApplication,
 
 import sys
 import time
+import math
 
 from ala.CartesianCoordinateSystem import CartesianCoordinateSystemWidget
 
@@ -104,7 +105,8 @@ class MainWindow( QDialog ):
         self.end   = 2
         
         self.rectanglesFunction = []
-        self.rectanglesIntegral = []
+        #~ self.rectanglesIntegral = []
+        self.pointsIntegral = []
         
         self.numberRectanglesMax = 1000
         
@@ -118,10 +120,14 @@ class MainWindow( QDialog ):
             ) 
             self.rectanglesFunction[i].setVisible( False ) 
             
-            self.rectanglesIntegral.append( 
-                    self.ccsIntegral.addLine( QPointF(0,0), QPointF(1,0), False, False, 'blue' ) 
+            #~ self.rectanglesIntegral.append( 
+                    #~ self.ccsIntegral.addLine( QPointF(0,0), QPointF(1,0), False, False, 'blue' ) 
+            #~ )
+            #~ self.rectanglesIntegral[i].setVisible( False ) 
+            self.pointsIntegral.append(
+                self.ccsIntegral.addPoint( 0, 0, 5, 0, 0, 200 )
             )
-            self.rectanglesIntegral[i].setVisible( False ) 
+            self.pointsIntegral[i].setVisible( False )
         
         self.numberRectanglesSpinBox = QSpinBox()
         self.numberRectanglesSpinBox.setMinimum ( 1 )
@@ -147,9 +153,6 @@ class MainWindow( QDialog ):
         self.changeFunction()
         
         self.integralPlot = self.ccsIntegral.addFunction( self.integral )
-        
-        # TODO: check that on scale out ccs expand.
-        
         
         self.scaleInButton  = QPushButton( "scale in" )
         self.scaleOutButton = QPushButton( "scale out" )
@@ -270,7 +273,7 @@ class MainWindow( QDialog ):
         # somewhat lazy input validation: set x=1 and testEval function
         try:
             # predefine x, because it is needed in eval
-            x = 1;
+            x = 1000;
             testEval = eval( str( self.editFunction.text() ) )
             ok = True
             # if eval is o.k., then print "ok"
@@ -284,7 +287,8 @@ class MainWindow( QDialog ):
             # integral are set invisible. 
             for i in range ( self.numberRectanglesMax ):
                 self.rectanglesFunction[i].setVisible( False ) 
-                self.rectanglesIntegral[i].setVisible( False )
+                #~ self.rectanglesIntegral[i].setVisible( False )
+                self.pointsIntegral[i].setVisible( False )
             
             # the function is redefined and painted.
             # TODO: this needs some input validation..
@@ -310,18 +314,31 @@ class MainWindow( QDialog ):
                 x1 = self.start + float( self.end - self.start ) / self.numberRectangles * ( i )
                 x2 = self.start + float( self.end - self.start ) / self.numberRectangles * (i+1)
                 
-                self.rectanglesFunction[i].setPosition( QPointF( x1, 0) , QPointF( x2, eval( self.function ) ) )
-                self.rectanglesFunction[i].setVisible( True )
+                #~ self.rectanglesFunction[i].setPosition( QPointF( x1, 0) , QPointF( x2, eval( self.function ) ) )
+                #~ self.rectanglesFunction[i].setVisible( True )
                 
                 # simply add sum up
-                ySum = ySum + eval( self.function )
+                # improve accuracy (and cheat: change determination of x: must be where arithmetic middle
+                # of y1 and y2 is, not middle between x1 and x2, so to speak)
+                #~ ySum = ySum + eval( self.function )
+                x = x1
+                y1 = eval( self.function )
+                x = x2
+                y2 = eval( self.function )
+                y = ( y1 + y2 ) / 2
+                ySum = ySum + y
+                
+                self.rectanglesFunction[i].setPosition( QPointF( x1, 0) , QPointF( x2, y ) )
+                self.rectanglesFunction[i].setVisible( True )
                 
                 # The value of the integral is dependent on the whole range and the number
                 # of rectangles. 
                 y = float( ySum ) * ( float (self.end - self.start) / self.numberRectangles )
                 
-                self.rectanglesIntegral[i].setPosition( QPointF(x1, y), QPointF(x2,y) ) 
-                self.rectanglesIntegral[i].setVisible( True )
+                #~ self.rectanglesIntegral[i].setPosition( QPointF(x1, y), QPointF(x2,y) ) 
+                #~ self.rectanglesIntegral[i].setVisible( True )
+                self.pointsIntegral[i].setPosition( x, y )
+                self.pointsIntegral[i].setVisible( True ) 
             
             self.reset()
         

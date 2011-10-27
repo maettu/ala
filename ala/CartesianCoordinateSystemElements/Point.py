@@ -112,10 +112,15 @@ class Point(QGraphicsItem):
         self.y = y
         self.setPosition()
         
-    def setPosition( self ):
-        self.setPos ( CST.toCcsCoord(
-            self.ccs, self.x, self.y )
-        )
+    def setPosition( self, x = False, y = False ):
+        if x == False and y == False:
+            self.setPos ( CST.toCcsCoord(
+                self.ccs, self.x, self.y )
+            )
+        else:
+            self.setPos( CST.toCcsCoord(
+                self.ccs, x, y )
+            )
         
     def setVisible( self, value ):
         self.visible = value
