@@ -40,7 +40,7 @@ class FunctionPlotter( QGraphicsItem ):
             pass
         
         # ep needs to be set to prevent from
-        # "assigned from before instantiated below"
+        # "assigned from before instantiated" below
         ep = None
         
         for xRaw in range ( self.ccs.xMin, self.ccs.xMax+1 ):
@@ -59,6 +59,39 @@ class FunctionPlotter( QGraphicsItem ):
                     pass
                 
                 sp = ep
+                
+    def getYMin( self, xMin, xMax, xStep):
+        ### return minimal y value in range xMin, xMax. xStep defines exactness. ###
+        if xStep == 0:
+            raise Exception( "xStep must not be 0" )
+            
+        x = xMin
+        yMin = self._y( x )
+        
+        while x < xMax:
+            y = self._y( x )
+            
+            if y < yMin:
+                yMin = y
+                
+            print "x:", x, "yMin:", yMin
+            x = x + xStep
+    
+        return yMin
+        
+    def getYMax( self, xMin, xMax, xStep):
+        ### return maximal x value in range xMin, xMax. xStep defines exactness. ###
+        if xStep == 0:
+            raise Exception( "xStep must not be 0" )
+        
+    def _y( self, x ):
+        try:
+            y = eval( self.function )
+        except:
+            y = False
+            
+        return y
+         
         
     def redefine( self, function ):
         self.function = function
