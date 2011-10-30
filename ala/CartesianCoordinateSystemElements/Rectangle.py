@@ -26,6 +26,7 @@ class Rectangle( QGraphicsRectItem ):
         return self.Rect
 
     def paint( self, painter, option, widget=None ):
+        print "wee"
         
         if self.visible == True:
             painter.setPen( QColor( self.color ) )
@@ -33,6 +34,8 @@ class Rectangle( QGraphicsRectItem ):
 
             self.sp = CST.toCcsCoord( self.ccs, self.startPoint.x(), self.startPoint.y() )
             self.ep = CST.toCcsCoord( self.ccs, self.endPoint.x(), self.endPoint.y() )
+            
+            print self.sp, self.ep
             
             self.Rect = QRectF( self.sp, self.ep )
             
@@ -51,12 +54,12 @@ class Rectangle( QGraphicsRectItem ):
     def setFillColor( self, fillColor ):
         self.fillColor = fillColor
         
-    def updateYourself( self, xDelta, yDelta ):
+    def updateYourself( self ):
         # There is no action needed, as a line gets its information
         # from startPoint and endPoint
         # Just adjust self.Rect to avoid case where line disappears mysteriously and after then,
         # paint() is never called again
-        self.Rect = QRectF( self.startPoint.x, self.startPoint.y, self.endPoint.x, self.endPoint.y )
+        self.Rect = QRectF( self.startPoint.x(), self.startPoint.y(), self.endPoint.x(), self.endPoint.y() )
 
 
 
