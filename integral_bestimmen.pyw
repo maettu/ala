@@ -100,16 +100,16 @@ class MainWindow( QDialog ):
         self.editIntegral = QLineEdit( self.integral )
         self.editIntegralMessage = QLabel( "ok" )
         
-        self.numberRectangles = 1
+        self.numberRectangles = 10
         self.start = 0
-        self.end   = 0.5
+        self.end   = 2
         
         self.rectanglesUndersum = []
         self.rectanglesOversum  = []
         self.pointsIntegralUnder = []
         self.pointsIntegralOver  = []
         
-        self.numberRectanglesMax = 10
+        self.numberRectanglesMax = 1000
         
         # I did not succeed in removing rectangles (segfaults..)
         # So, there are numberRectanglesMax rectangles predefined
@@ -159,13 +159,13 @@ class MainWindow( QDialog ):
         self.lowerIntegrationBorderSpinBox.setMinimum( -1000 )
         self.lowerIntegrationBorderSpinBox.setMaximum( 1000 )
         self.lowerIntegrationBorderSpinBox.setValue( self.start )
-        self.lowerIntegrationBorderSpinBox.setSingleStep( 0.01 )
+        self.lowerIntegrationBorderSpinBox.setSingleStep( 0.1 )
         
         self.upperIntegrationBorderSpinBox = QDoubleSpinBox()
         self.upperIntegrationBorderSpinBox.setMinimum( -1000 )
         self.upperIntegrationBorderSpinBox.setMaximum( 1000 )
         self.upperIntegrationBorderSpinBox.setValue( self.end )
-        self.upperIntegrationBorderSpinBox.setSingleStep( 0.01 )
+        self.upperIntegrationBorderSpinBox.setSingleStep( 0.1 )
        
 
         self.functionPlot = self.ccsFunction.addFunction( self.function )
@@ -343,9 +343,7 @@ class MainWindow( QDialog ):
             
             # iterate over the number of rectangles, set their position and
             # make them visible.
-            print "****"
             for i in range( self.numberRectangles ):
-                print i
                 # x i "in the middle" of a rectangle.
                 # x is the variable in the function string and gets eval'ed
                 x = self.start + float( self.end - self.start ) / self.numberRectangles * (i + 0.5)
@@ -408,8 +406,6 @@ class MainWindow( QDialog ):
                     self.pointsIntegralUnder[i].setVisible( True ) 
                 
             self.reset()
-            
-            print "****"
         
     def changeIntegral( self ):
         try:

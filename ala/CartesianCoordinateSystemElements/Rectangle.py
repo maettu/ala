@@ -26,7 +26,6 @@ class Rectangle( QGraphicsRectItem ):
         return self.Rect
 
     def paint( self, painter, option, widget=None ):
-        print "wee"
         
         if self.visible == True:
             painter.setPen( QColor( self.color ) )
@@ -34,8 +33,6 @@ class Rectangle( QGraphicsRectItem ):
 
             self.sp = CST.toCcsCoord( self.ccs, self.startPoint.x(), self.startPoint.y() )
             self.ep = CST.toCcsCoord( self.ccs, self.endPoint.x(), self.endPoint.y() )
-            
-            print self.sp, self.ep
             
             self.Rect = QRectF( self.sp, self.ep )
             
