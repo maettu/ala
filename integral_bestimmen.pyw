@@ -103,8 +103,10 @@ class MainWindow( QDialog ):
         self.start = 0
         self.end   = 2
         
-        self.rectanglesFunction = []
-        self.pointsIntegral = []
+        self.rectanglesUndersum = []
+        self.rectanglesOversum  = []
+        self.pointsIntegralUnder = []
+        self.pointsIntegralOver  = []
         
         self.numberRectanglesMax = 1000
         
@@ -113,22 +115,33 @@ class MainWindow( QDialog ):
         # which are setPosition and setVisible on changeFunction.
         # This is not preemptive optimization, this is a workaround.
         for i in range ( self.numberRectanglesMax ):
-            self.rectanglesFunction.append( self.ccsFunction.addRectangle( 
-                    QPointF( 0, 0 ) , QPointF( 1, 0 ) ) 
+            self.rectanglesUndersum.append( self.ccsFunction.addRectangle( 
+                    QPointF( 0, 0 ) , QPointF( 1, 0 ), 'blue', 'blueViolet' ) 
             ) 
-            self.rectanglesFunction[i].setVisible( False ) 
+            self.rectanglesOversum.append( self.ccsFunction.addRectangle(
+                    QPointF( 0, 0 ) , QPointF( 1, 0 ), 'red', 'orangeRed' )
+            )
+            self.rectanglesUndersum[i].setVisible( False ) 
+            self.rectanglesOversum[i].setVisible( False )
             # sets rectangle behind functionPlot
-            self.rectanglesFunction[i].setZValue( 2 )
+            self.rectanglesUndersum[i].setZValue( 2 )
+            self.rectanglesOversum[i].setZValue( 1 )
             
             #~ self.rectanglesIntegral.append( 
                     #~ self.ccsIntegral.addLine( QPointF(0,0), QPointF(1,0), False, False, 'blue' ) 
             #~ )
             #~ self.rectanglesIntegral[i].setVisible( False ) 
-            self.pointsIntegral.append(
+            self.pointsIntegralUnder.append(
                 self.ccsIntegral.addPoint( 0, 0, 5, 0, 0, 200 )
             )
-            self.pointsIntegral[i].setVisible( False )
-            self.pointsIntegral[i].setZValue( 2 )
+            self.pointsIntegralOver.append(
+                self.ccsIntegral.addPoint( 0, 0, 5, 200, 0, 0 )
+            )
+        
+            self.pointsIntegralUnder[i].setVisible( False )
+            self.pointsIntegralUnder[i].setZValue( 2 )
+            self.pointsIntegralOver[i].setVisible( False )
+            self.pointsIntegralOver[i].setZValue( 2 )
         
         self.numberRectanglesSpinBox = QSpinBox()
         self.numberRectanglesSpinBox.setMinimum ( 1 )
@@ -291,9 +304,11 @@ class MainWindow( QDialog ):
             # All rectangles under the function and all lines on the
             # integral are set invisible. 
             for i in range ( self.numberRectanglesMax ):
-                self.rectanglesFunction[i].setVisible( False ) 
+                self.rectanglesUndersum[i].setVisible( False ) 
+                self.rectanglesOversum[i].setVisible( False )
                 #~ self.rectanglesIntegral[i].setVisible( False )
-                self.pointsIntegral[i].setVisible( False )
+                self.pointsIntegralUnder[i].setVisible( False )
+                self.pointsIntegralOver[i].setVisible( False )
             
             # the function is redefined and painted.
             # TODO: this needs some input validation..
@@ -301,7 +316,9 @@ class MainWindow( QDialog ):
             self.functionPlot.redefine  ( self.function )
             
             # ySum is the sum of all rectangles below the function
-            ySum = 0
+            #~ ySum = 0
+            yUndersumTotal = 0
+            yOversumTotal  = 0
             
             # set all values (lazyness)
             self.numberRectangles = self.numberRectanglesSpinBox.value()
@@ -319,12 +336,12 @@ class MainWindow( QDialog ):
                 x1 = self.start + float( self.end - self.start ) / self.numberRectangles * ( i )
                 x2 = self.start + float( self.end - self.start ) / self.numberRectangles * (i+1)
                 
-                print 'gugu', self.functionPlot.getYMin( x1, x2, (x2-x1) / 10 )
-                print 'gugu', self.functionPlot.getYMin( x1, x2, 0 )
-
+                #~ print 'gugu', self.functionPlot.getYMin( x1, x2, (x2-x1) / 100 )
+                yUndersum = self.functionPlot.getYMin( x1, x2, (x2-x1) / 100 )
+                yOversum  = self.functionPlot.getYMax( x1, x2, (x2-x1) / 100 )
                 
-                #~ self.rectanglesFunction[i].setPosition( QPointF( x1, 0) , QPointF( x2, eval( self.function ) ) )
-                #~ self.rectanglesFunction[i].setVisible( True )
+                #~ self.rectanglesUndersum[i].setPosition( QPointF( x1, 0) , QPointF( x2, eval( self.function ) ) )
+                #~ self.rectanglesUndersum[i].setVisible( True )
                 
                 # simply add sum up
                 # improve accuracy (and cheat: change determination of x: must be where arithmetic middle
@@ -335,19 +352,33 @@ class MainWindow( QDialog ):
                 x = x2
                 y2 = eval( self.function )
                 y = ( y1 + y2 ) / 2
-                ySum = ySum + y
+                #~ ySum = ySum + y
+                yUndersumTotal = yUndersumTotal + yUndersum
+                yOversumTotal  = yOversumTotal  + yOversum
                 
-                self.rectanglesFunction[i].setPosition( QPointF( x1, 0) , QPointF( x2, y ) )
-                self.rectanglesFunction[i].setVisible( True )
+                #~ self.rectanglesUndersum[i].setPosition( QPointF( x1, 0) , QPointF( x2, y ) )
+                self.rectanglesUndersum[i].setPosition( QPointF( x1, 0)         , QPointF( x2, yUndersum ) )
+                self.rectanglesOversum[i].setPosition(  QPointF( x1, yUndersum) , QPointF( x2, yOversum  ) )
+                
+                self.rectanglesUndersum[i].setVisible( True )
+                self.rectanglesOversum[i].setVisible( True )
                 
                 # The value of the integral is dependent on the whole range and the number
                 # of rectangles. 
-                y = float( ySum ) * ( float (self.end - self.start) / self.numberRectangles )
+                #~ y = float( ySum ) * ( float (self.end - self.start) / self.numberRectangles )
+                
+                yIntegralUnder = float( yUndersumTotal ) * ( float( self.end - self.start ) / self.numberRectangles )
+                yIntegralOver  = float( yOversumTotal  ) * ( float( self.end - self.start ) / self.numberRectangles )
                 
                 #~ self.rectanglesIntegral[i].setPosition( QPointF(x1, y), QPointF(x2,y) ) 
                 #~ self.rectanglesIntegral[i].setVisible( True )
-                self.pointsIntegral[i].setPosition( x, y )
-                self.pointsIntegral[i].setVisible( True ) 
+                # only draw last point
+                if i == self.numberRectangles-1:
+                    self.pointsIntegralOver[i].setPosition( x, yIntegralOver )
+                    self.pointsIntegralOver[i].setVisible( True )
+                    self.pointsIntegralUnder[i].setPosition( x, yIntegralUnder )
+                    self.pointsIntegralUnder[i].setVisible( True ) 
+
             
             self.reset()
         

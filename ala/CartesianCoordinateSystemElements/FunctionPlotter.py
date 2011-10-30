@@ -74,7 +74,7 @@ class FunctionPlotter( QGraphicsItem ):
             if y < yMin:
                 yMin = y
                 
-            print "x:", x, "yMin:", yMin
+            #~ print "x:", x, "yMin:", yMin
             x = x + xStep
     
         return yMin
@@ -83,6 +83,19 @@ class FunctionPlotter( QGraphicsItem ):
         ### return maximal x value in range xMin, xMax. xStep defines exactness. ###
         if xStep == 0:
             raise Exception( "xStep must not be 0" )
+            
+        x = xMin
+        yMax = self._y( x )
+        
+        while x < xMax:
+            y = self._y( x )
+            
+            if y > yMax:
+                yMax = y
+                
+            x = x + xStep
+    
+        return yMax
         
     def _y( self, x ):
         try:

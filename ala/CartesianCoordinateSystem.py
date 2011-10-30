@@ -24,15 +24,15 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
     
     def __init__(
             self, scene, 
-            widthPixel=500, 
-            heightPixel=500, 
+            widthPixel  = 500, 
+            heightPixel = 500, 
             marginPixel = 10, 
-            xMin = -10, 
-            xMax = 10, 
-            yMin = -10, 
-            yMax = 10, 
-            tickXOffset=0.1, 
-            tickYOffset=0.1
+            xMin        = -10, 
+            xMax        = 10, 
+            yMin        = -10, 
+            yMax        = 10, 
+            tickXOffset = 0.1, 
+            tickYOffset = 0.1
         ):
         super(CartesianCoordinateSystemWidget, self).__init__()
         
@@ -47,16 +47,6 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         self.yMax           = yMax
         self.tickXOffset    = tickXOffset
         self.tickYOffset    = tickYOffset
-        
-        # TODO, hardcoding is bad.
-        #~ self.ySkip          = 1
-        
-        # TODO: yRange needs to be adjusted to axis. start -7, skip = 2 -> Axis not drawn. Bad.
-        #~ self.yRange         = []
-        #~ for i in range (self.yMin-self.ySkip, self.yMax+2*self.ySkip):
-            #~ if i % self.ySkip == 0:
-                #~ self.yRange.append( i )
-                
         
         # needed for explicit adds of elements like FunctionPlotter. How to get rid of this?
         self.scene = scene
@@ -275,12 +265,13 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         endPoint.addChildPoint(line)
         return line
     
-    def addRectangle( self, startPoint, endPoint, color = 'blue' ):
+    def addRectangle( self, startPoint, endPoint, color = 'blue', fillColor = 'lightBlue' ):
         rect = Rectangle(
             startPoint,
             endPoint,
             self,
-            color
+            color,
+            fillColor
         )
         return rect
         
