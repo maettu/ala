@@ -45,6 +45,12 @@ class Rectangle( QGraphicsRectItem ):
     def setVisible( self, value ):
         self.visible = value
         
+    def setColor( self, color ):
+        self.color = color
+        
+    def setFillColor( self, fillColor ):
+        self.fillColor = fillColor
+        
     def updateYourself( self, xDelta, yDelta ):
         # There is no action needed, as a line gets its information
         # from startPoint and endPoint
