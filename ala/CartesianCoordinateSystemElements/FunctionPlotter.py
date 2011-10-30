@@ -60,38 +60,59 @@ class FunctionPlotter( QGraphicsItem ):
                 
                 sp = ep
                 
-    def getYMin( self, xMin, xMax, xStep):
+    def getYMin( self, xMin, xMax, xStep, maxStep = 1000):
         ### return minimal y value in range xMin, xMax. xStep defines exactness. ###
         if xStep == 0:
             raise Exception( "xStep must not be 0" )
             
+        if xMin > xMax:
+            xMin, xMax = xMax, xMin
+        if xStep < 0:
+            xStep = xStep * -1
+            
         x = xMin
         yMin = self._y( x )
         
+        i = 0
         while x < xMax:
             y = self._y( x )
             
             if y < yMin:
                 yMin = y
                 
-            #~ print "x:", x, "yMin:", yMin
+            # avoid "infinite" loop
+            if i == maxStep:
+                return yMin
+            i+= 1
+                
             x = x + xStep
     
         return yMin
         
-    def getYMax( self, xMin, xMax, xStep):
+    def getYMax( self, xMin, xMax, xStep, maxStep = 1000):
         ### return maximal x value in range xMin, xMax. xStep defines exactness. ###
         if xStep == 0:
             raise Exception( "xStep must not be 0" )
             
+        if xMin > xMax:
+            xMin, xMax = xMax, xMin
+        if xStep < 0:
+            xStep = xStep * -1
+            
         x = xMin
         yMax = self._y( x )
         
+        i = 0
         while x < xMax:
             y = self._y( x )
             
             if y > yMax:
                 yMax = y
+                
+            # avoid "infinite" loop
+            if i == maxStep:
+                return yMax
+            i+=1
                 
             x = x + xStep
     
