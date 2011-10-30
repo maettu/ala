@@ -17,6 +17,7 @@ from PyQt4.QtCore import (  Qt,
                             QString
                         )
 from PyQt4.QtGui import (   QApplication, 
+                            QCheckBox,
                             QFrame,
                             QGraphicsScene, 
                             QGraphicsView, 
@@ -116,7 +117,7 @@ class MainWindow( QDialog ):
         # This is not preemptive optimization, this is a workaround.
         for i in range ( self.numberRectanglesMax ):
             self.rectanglesUndersum.append( self.ccsFunction.addRectangle( 
-                    QPointF( 0, 0 ) , QPointF( 1, 0 ), 'blue', 'blueViolet' ) 
+                    QPointF( 0, 0 ) , QPointF( 1, 0 ), 'blue', 'darkViolet' ) 
             ) 
             self.rectanglesOversum.append( self.ccsFunction.addRectangle(
                     QPointF( 0, 0 ) , QPointF( 1, 0 ), 'red', 'orangeRed' )
@@ -132,16 +133,21 @@ class MainWindow( QDialog ):
             #~ )
             #~ self.rectanglesIntegral[i].setVisible( False ) 
             self.pointsIntegralUnder.append(
-                self.ccsIntegral.addPoint( 0, 0, 5, 0, 0, 200 )
+                self.ccsIntegral.addPoint( 0, 0, 10, 0, 0, 200 )
             )
             self.pointsIntegralOver.append(
-                self.ccsIntegral.addPoint( 0, 0, 5, 200, 0, 0 )
+                self.ccsIntegral.addPoint( 0, 0, 10, 200, 0, 0 )
             )
         
             self.pointsIntegralUnder[i].setVisible( False )
             self.pointsIntegralUnder[i].setZValue( 2 )
             self.pointsIntegralOver[i].setVisible( False )
             self.pointsIntegralOver[i].setZValue( 2 )
+            
+        self.showUndersum = QCheckBox( 'Untersumme' )
+        self.showOversum  = QCheckBox( 'Obersumme'  )
+        self.showUndersum.setChecked( True )
+        self.showOversum. setChecked( True )
         
         self.numberRectanglesSpinBox = QSpinBox()
         self.numberRectanglesSpinBox.setMinimum ( 1 )
@@ -153,13 +159,13 @@ class MainWindow( QDialog ):
         self.lowerIntegrationBorderSpinBox.setMinimum( -1000 )
         self.lowerIntegrationBorderSpinBox.setMaximum( 1000 )
         self.lowerIntegrationBorderSpinBox.setValue( self.start )
-        self.lowerIntegrationBorderSpinBox.setSingleStep( 0.01 )
+        self.lowerIntegrationBorderSpinBox.setSingleStep( 0.1 )
         
         self.upperIntegrationBorderSpinBox = QDoubleSpinBox()
         self.upperIntegrationBorderSpinBox.setMinimum( -1000 )
         self.upperIntegrationBorderSpinBox.setMaximum( 1000 )
         self.upperIntegrationBorderSpinBox.setValue( self.end )
-        self.upperIntegrationBorderSpinBox.setSingleStep( 0.01 )
+        self.upperIntegrationBorderSpinBox.setSingleStep( 0.1 )
        
 
         self.functionPlot = self.ccsFunction.addFunction( self.function )
@@ -193,7 +199,7 @@ class MainWindow( QDialog ):
         
         layout.addLayout                ( layoutTop )
         
-        layout.addWidget( QLabel( "Funktion und Rechtecke auf Funktion" ) )
+        layout.addWidget( QLabel( "Funktion, Ober- und Untersumme" ) )
         
         layout.addWidget                ( viewFunction )
         
@@ -218,6 +224,11 @@ class MainWindow( QDialog ):
         
         layoutIntegrationBorders.addWidget ( QLabel( "Obere Integrationsgrenze" ) )
         layoutIntegrationBorders.addWidget ( self.upperIntegrationBorderSpinBox )
+        
+        layoutShowSums = QHBoxLayout ()
+        layoutShowSums.addWidget( self.showUndersum )
+        layoutShowSums.addWidget( self.showOversum  )
+        layout.addLayout( layoutShowSums )
         
         separator = QFrame()
         separator.setFrameStyle( QFrame.HLine )
@@ -250,6 +261,11 @@ class MainWindow( QDialog ):
                                                                 self.scaleIn            )
         self.connect                ( self.scaleOutButton, SIGNAL( "clicked()" ),
                                                                 self.scaleOut           )
+                                                                
+        self.connect                ( self.showUndersum, SIGNAL( "stateChanged(int)" ),
+                                                                self.changeFunction     )
+        self.connect                ( self.showOversum, SIGNAL( "stateChanged(int)" ),
+                                                                self.changeFunction     )
                                                                 
         self.connect                (self.numberRectanglesSpinBox, SIGNAL( "valueChanged(int)" ),
                                                                 self.changeFunction           )
@@ -357,11 +373,23 @@ class MainWindow( QDialog ):
                 yOversumTotal  = yOversumTotal  + yOversum
                 
                 #~ self.rectanglesUndersum[i].setPosition( QPointF( x1, 0) , QPointF( x2, y ) )
-                self.rectanglesUndersum[i].setPosition( QPointF( x1, 0)         , QPointF( x2, yUndersum ) )
-                self.rectanglesOversum[i].setPosition(  QPointF( x1, yUndersum) , QPointF( x2, yOversum  ) )
+                if self.showUndersum.isChecked() and self.showOversum.isChecked():
+                    self.rectanglesUndersum[i].setPosition( QPointF( x1, 0)         , QPointF( x2, yUndersum ) )
+                    self.rectanglesUndersum[i].setFillColor( 'blueViolet' )
+                    self.rectanglesUndersum[i].setVisible( True )
+
+                    self.rectanglesOversum[i].setPosition(  QPointF( x1, yUndersum) , QPointF( x2, yOversum  ) )
+                    self.rectanglesOversum[i].setVisible( True )
                 
-                self.rectanglesUndersum[i].setVisible( True )
-                self.rectanglesOversum[i].setVisible( True )
+                elif self.showUndersum.isChecked():
+                    self.rectanglesUndersum[i].setPosition( QPointF( x1, 0)         , QPointF( x2, yUndersum ) )
+                    self.rectanglesUndersum[i].setFillColor( 'lightBlue' )
+                    self.rectanglesUndersum[i].setVisible( True )
+
+                    
+                elif self.showOversum.isChecked():
+                    self.rectanglesOversum[i].setPosition(  QPointF( x1, 0) , QPointF( x2, yOversum  ) )
+                    self.rectanglesOversum[i].setVisible( True )
                 
                 # The value of the integral is dependent on the whole range and the number
                 # of rectangles. 
