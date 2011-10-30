@@ -354,8 +354,17 @@ class MainWindow( QDialog ):
                 
                 xStep = (x2-x1) / 100
                 
-                yUndersum = self.functionPlot.getYMin( x1, x2, (x2-x1) / 100 )
-                yOversum  = self.functionPlot.getYMax( x1, x2, (x2-x1) / 100 )
+                # this happens when x1 and x2 are *really* close together.
+                # It then does not happen a lot how large yUndersum and yOversum
+                # are exactly. There is virtually nothing painted at all, only a 
+                # slim line. Doing this prevents from getting exceptions thrown by 
+                # getYMin and getYMax respectively
+                if xStep == 0:
+                    yUndersum = eval( self.function )
+                    yOversum = yUndersum
+                else:
+                    yUndersum = self.functionPlot.getYMin( x1, x2, (x2-x1) / 10 )
+                    yOversum  = self.functionPlot.getYMax( x1, x2, (x2-x1) / 10 )
                 
                 # simply add sum up
                 # improve accuracy (and cheat: change determination of x: must be where arithmetic middle
