@@ -89,18 +89,18 @@ class MainWindow( QDialog ):
         
         # set function
         #~ self.function = '2*x*math.exp(x**2) / 100'
-        self.function = 'x**2'
+        self.function = '1'
         
         self.editFunction = QLineEdit( self.function )
         #~ self.editFunction.selectAll( )
         self.editFunctionMessage = QLabel( "ok" )
         
-        self.integral = 'x**3/3'
+        self.integral = '1'
         
         self.editIntegral = QLineEdit( self.integral )
         self.editIntegralMessage = QLabel( "ok" )
         
-        self.numberRectangles = 10
+        self.numberRectangles = 1
         self.start = 0
         self.end   = 2
         
@@ -147,7 +147,7 @@ class MainWindow( QDialog ):
         self.showUndersum = QCheckBox( 'Untersumme' )
         self.showOversum  = QCheckBox( 'Obersumme'  )
         self.showUndersum.setChecked( True )
-        self.showOversum. setChecked( True )
+        self.showOversum. setChecked( False )
         
         self.numberRectanglesSpinBox = QSpinBox()
         self.numberRectanglesSpinBox.setMinimum ( 1 )
@@ -379,40 +379,78 @@ class MainWindow( QDialog ):
                 yUndersumTotal = yUndersumTotal + yUndersum
                 yOversumTotal  = yOversumTotal  + yOversum
                 
-                if self.showUndersum.isChecked() and self.showOversum.isChecked():
-                    self.rectanglesUndersum[i].setPosition( QPointF( x1, 0)         , QPointF( x2, yUndersum ) )
-                    self.rectanglesUndersum[i].setFillColor( 'blueViolet' )
-                    self.rectanglesUndersum[i].setVisible( True )
-                    self.rectanglesUndersum[i].updateYourself( )
+                # The value of the integral is dependent on the whole range and the number
+                # of rectangles. 
 
-                    self.rectanglesOversum[i].setPosition(  QPointF( x1, yUndersum) , QPointF( x2, yOversum  ) )
-                    self.rectanglesOversum[i].setVisible( True )
-                    self.rectanglesOversum[i].updateYourself()
+                yIntegralUnder = float( yUndersumTotal ) * ( float( self.end - self.start ) / self.numberRectangles )
+                yIntegralOver  = float( yOversumTotal  ) * ( float( self.end - self.start ) / self.numberRectangles )
+                
+                if self.showUndersum.isChecked() and self.showOversum.isChecked():
+                    # one is positive, one is negative:
+                    if (yUndersum < 0 and yOversum > 0) or (yUndersum > 0 and yOversum < 0 ):
+                        #.. simply draw them
+                        self.rectanglesUndersum[i].setPosition( QPointF( x1, 0)         , QPointF( x2, yUndersum ) )
+                        self.rectanglesUndersum[i].setFillColor( 'lightBlue' )
+                        self.rectanglesUndersum[i].setVisible( True )
+                        self.rectanglesUndersum[i].updateYourself( )
+                        
+                        self.rectanglesOversum[i].setPosition(  QPointF( x1, 0) , QPointF( x2, yOversum  ) )
+                        self.rectanglesOversum[i].setFillColor( 'orangeRed' )
+                        self.rectanglesOversum[i].setVisible( True )
+                        self.rectanglesOversum[i].updateYourself()
+                    
+                    # both are negative:
+                    elif yUndersum < 0 and yOversum < 0:
+                        self.rectanglesOversum[i].setPosition( QPointF( x1, 0)         , QPointF( x2, yUndersum ) )
+                        self.rectanglesOversum[i].setFillColor( 'blueViolet' )
+                        self.rectanglesOversum[i].setVisible( True )
+                        self.rectanglesOversum[i].updateYourself( )
+
+                        self.rectanglesUndersum[i].setPosition(  QPointF( x1, yOversum) , QPointF( x2, yUndersum  ) )
+                        self.rectanglesUndersum[i].setFillColor( 'lightBlue' )
+                        self.rectanglesUndersum[i].setVisible( True )
+                        self.rectanglesUndersum[i].updateYourself()
+                    
+                    # both are positive or one is zero asf.
+                    else:
+                        self.rectanglesUndersum[i].setPosition( QPointF( x1, 0)         , QPointF( x2, yUndersum ) )
+                        self.rectanglesUndersum[i].setFillColor( 'blueViolet' )
+                        self.rectanglesUndersum[i].setVisible( True )
+                        self.rectanglesUndersum[i].updateYourself( )
+
+                        self.rectanglesOversum[i].setPosition(  QPointF( x1, yUndersum) , QPointF( x2, yOversum  ) )
+                        self.rectanglesOversum[i].setFillColor( 'orangeRed' )
+                        self.rectanglesOversum[i].setVisible( True )
+                        self.rectanglesOversum[i].updateYourself()
+                    
+                    # only draw last point
+                    if i == self.numberRectangles-1:
+                        self.pointsIntegralOver[i].setPosition( x, yIntegralOver )
+                        self.pointsIntegralOver[i].setVisible( True )
+                        self.pointsIntegralUnder[i].setPosition( x, yIntegralUnder )
+                        self.pointsIntegralUnder[i].setVisible( True ) 
                 
                 elif self.showUndersum.isChecked():
                     self.rectanglesUndersum[i].setPosition( QPointF( x1, 0)         , QPointF( x2, yUndersum ) )
                     self.rectanglesUndersum[i].setFillColor( 'lightBlue' )
                     self.rectanglesUndersum[i].setVisible( True )
                     self.rectanglesUndersum[i].updateYourself( )
+                    
+                    # only draw last point
+                    if i == self.numberRectangles-1:
+                        self.pointsIntegralUnder[i].setPosition( x, yIntegralUnder )
+                        self.pointsIntegralUnder[i].setVisible( True )
 
                     
                 elif self.showOversum.isChecked():
                     self.rectanglesOversum[i].setPosition(  QPointF( x1, 0) , QPointF( x2, yOversum  ) )
                     self.rectanglesOversum[i].setVisible( True )
                     self.rectanglesOversum[i].updateYourself()
-                
-                # The value of the integral is dependent on the whole range and the number
-                # of rectangles. 
-
-                yIntegralUnder = float( yUndersumTotal ) * ( float( self.end - self.start ) / self.numberRectangles )
-                yIntegralOver  = float( yOversumTotal  ) * ( float( self.end - self.start ) / self.numberRectangles )
-            
-                # only draw last point
-                if i == self.numberRectangles-1:
-                    self.pointsIntegralOver[i].setPosition( x, yIntegralOver )
-                    self.pointsIntegralOver[i].setVisible( True )
-                    self.pointsIntegralUnder[i].setPosition( x, yIntegralUnder )
-                    self.pointsIntegralUnder[i].setVisible( True ) 
+                    
+                    # only draw last point
+                    if i == self.numberRectangles-1:
+                        self.pointsIntegralOver[i].setPosition( x, yIntegralOver )
+                        self.pointsIntegralOver[i].setVisible( True )
                 
             self.reset()
         
