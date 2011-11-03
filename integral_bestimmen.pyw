@@ -219,10 +219,10 @@ class MainWindow( QDialog ):
         
         layoutIntegrationBorders = QHBoxLayout ()
         layout.addLayout                ( layoutIntegrationBorders )
-        layoutIntegrationBorders.addWidget ( QLabel( "Untere Integrationsgrenze" ) )
+        layoutIntegrationBorders.addWidget ( QLabel( "Untere Flächengrenze" ) )
         layoutIntegrationBorders.addWidget ( self.lowerIntegrationBorderSpinBox )
         
-        layoutIntegrationBorders.addWidget ( QLabel( "Obere Integrationsgrenze" ) )
+        layoutIntegrationBorders.addWidget ( QLabel( "Obere Flächengrenze" ) )
         layoutIntegrationBorders.addWidget ( self.upperIntegrationBorderSpinBox )
         
         layoutShowSums = QHBoxLayout ()
@@ -233,6 +233,8 @@ class MainWindow( QDialog ):
         separator = QFrame()
         separator.setFrameStyle( QFrame.HLine )
         layout.addWidget( separator )
+        
+        layout.addWidget                (QLabel( "Flächenfunktion" ) )
         
         layout.addWidget                ( viewIntegral )
         
