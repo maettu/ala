@@ -255,13 +255,14 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         endPoint.addChildPoint(line)
         return line
     
-    def addRectangle( self, startPoint, endPoint, color = 'blue', fillColor = 'lightBlue' ):
+    def addRectangle( self, startPoint, endPoint, color = 'blue', fillColor = 'lightBlue', opacity = 1 ):
         rect = Rectangle(
             startPoint,
             endPoint,
             self,
             color,
-            fillColor
+            fillColor,
+            opacity
         )
         return rect
         

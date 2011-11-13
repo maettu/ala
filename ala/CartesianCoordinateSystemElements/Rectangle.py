@@ -8,7 +8,7 @@ import ala.Helper.CoordinateSystemTransformation as CST
 class Rectangle( QGraphicsRectItem ):
     """Defines a rectangle by two points. If points are moved, rectangle follows these movements."""
     
-    def __init__( self, startPoint, endPoint, ccs, color = 'blue', fillColor = 'lightBlue' ):
+    def __init__( self, startPoint, endPoint, ccs, color = 'blue', fillColor = 'lightBlue', opacity = 1 ):
         super( Rectangle, self ).__init__( ccs )
         
         self.startPoint     = startPoint
@@ -16,11 +16,14 @@ class Rectangle( QGraphicsRectItem ):
         self.ccs            = ccs
         self.color          = color
         self.fillColor      = fillColor
+        self.opacity        = opacity
         
         self.visible        = True
 
         
         self.Rect = QRectF( self.startPoint, self.endPoint )
+        
+        self.setOpacity( opacity )
 
     def boundingRect( self ):
         return self.Rect
