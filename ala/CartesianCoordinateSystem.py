@@ -82,19 +82,9 @@ class CartesianCoordinateSystemWidget(QGraphicsItem):
         return self.Rect
         
     def initialize(self):
-        if self.xMin <= 0 and self.xMax <= 0:
-            self.xAxis = self.width
-        elif self.xMin >= 0 and self.xMax >= 0:
-            self.xAxis = 0
-        else:
-            self.xAxis = self.width / ( self.xMax - self.xMin ) * -self.xMin + self.margin / 2
+        self.xAxis = self.width / ( self.xMax - self.xMin ) * -self.xMin + self.margin / 2
             
-        if self.yMin <= 0 and self.yMax <= 0:
-            self.yAxis = self.height
-        elif self.yMin >= 0 and self.yMax >= 0:
-            self.yAxis = 0
-        else:
-            self.yAxis = self.height - ( self.height / (self.yMax - self.yMin) * -self.yMin ) - self.margin / 2
+        self.yAxis = self.height - ( self.height / (self.yMax - self.yMin) * -self.yMin ) - self.margin / 2
         
         # make Rect safely larger than window.
         self.Rect = QRectF( 
